@@ -1,22 +1,22 @@
 # API Usage
 
-Pixelle-Video provides a complete Python API for easy integration into your projects.
+Lumina Video Studio provides a complete Python API for easy integration into your projects.
 
 ---
 
 ## Quick Start
 
 ```python
-from pixelle_video.service import PixelleVideoCore
+from lumina_video.service import LuminaVideoCore
 import asyncio
 
 async def main():
     # Initialize
-    pixelle = PixelleVideoCore()
-    await pixelle.initialize()
+    lumina = LuminaVideoCore()
+    await lumina.initialize()
     
     # Generate video
-    result = await pixelle.generate_video(
+    result = await lumina.generate_video(
         text="Why develop a reading habit",
         mode="generate",
         n_scenes=5

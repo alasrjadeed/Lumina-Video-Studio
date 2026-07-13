@@ -21,8 +21,8 @@ from web.components.content_input import render_version_info
 from web.utils.async_helpers import run_async
 from web.utils.history_persistence import save_web_generation_history
 from web.utils.streamlit_helpers import check_and_warn_selfhost_workflow
-from pixelle_video.config import config_manager
-from pixelle_video.utils.os_util import create_task_output_dir
+from lumina_video.config import config_manager
+from lumina_video.utils.os_util import create_task_output_dir
 
 class ImageToVideoPipelineUI(PipelineUI):
     """
@@ -40,7 +40,7 @@ class ImageToVideoPipelineUI(PipelineUI):
     def description(self):
         return tr("pipeline.i2v.description")
 
-    def render(self, pixelle_video: Any):
+    def render(self, lumina_video: Any):
         # Two-column layout
         left_col,right_col = st.columns([1, 1])
 
@@ -48,7 +48,7 @@ class ImageToVideoPipelineUI(PipelineUI):
         # Left Column: Asset Upload
         # ====================================================================
         with left_col:
-            asset_params = self.render_audio_visual_input(pixelle_video)
+            asset_params = self.render_audio_visual_input(lumina_video)
             render_version_info()
 
         # ====================================================================
@@ -59,9 +59,9 @@ class ImageToVideoPipelineUI(PipelineUI):
                 **asset_params
             }
 
-            self._render_output_preview(pixelle_video, video_params)
+            self._render_output_preview(lumina_video, video_params)
 
-    def render_audio_visual_input(self, pixelle_video) -> dict:
+    def render_audio_visual_input(self, lumina_video) -> dict:
         with st.container(border=True):
             st.markdown(f"**{tr('i2v.video_generation')}**")
 
@@ -74,13 +74,13 @@ class ImageToVideoPipelineUI(PipelineUI):
             def list_i2v_workflows():
                 if workflow_source == "api":
                     return list_api_media_workflows(
-                        pixelle_video,
+                        lumina_video,
                         "video",
                         required_adapter_abilities=["first_frame_i2v"],
                         verified_only=True,
                     )
                 return list_local_media_workflows(
-                    pixelle_video,
+                    lumina_video,
                     "video",
                     workflow_source,
                     key_prefix="i2v_",
@@ -120,7 +120,7 @@ class ImageToVideoPipelineUI(PipelineUI):
                             # Check if image
                             ext = Path(path).suffix.lower()
                             if ext in [".jpg", ".jpeg", ".png", ".webp"]:
-                                st.image(file, caption=file.name, use_container_width=True)
+                                st.image(file, caption=file.name, width="stretch")
             else:
                 st.info(tr("i2v.assets.character_empty_hint"))
             
@@ -133,12 +133,12 @@ class ImageToVideoPipelineUI(PipelineUI):
                         )
 
             source_options = []
-            if list_local_media_workflows(pixelle_video, "video", "runninghub", key_prefix="i2v_"):
+            if list_local_media_workflows(lumina_video, "video", "runninghub", key_prefix="i2v_"):
                 source_options.append("runninghub")
-            if list_local_media_workflows(pixelle_video, "video", "selfhost", key_prefix="i2v_"):
+            if list_local_media_workflows(lumina_video, "video", "selfhost", key_prefix="i2v_"):
                 source_options.append("selfhost")
             if list_api_media_workflows(
-                pixelle_video,
+                lumina_video,
                 "video",
                 required_adapter_abilities=["first_frame_i2v"],
                 verified_only=True,
@@ -211,7 +211,7 @@ class ImageToVideoPipelineUI(PipelineUI):
                 "api_video_params": api_video_params,
                 }
 
-    def _render_output_preview(self, pixelle_video: Any, video_params: dict):
+    def _render_output_preview(self, lumina_video: Any, video_params: dict):
         """Render output preview section"""
         with st.container(border=True):
             st.markdown(f"**{tr('section.video_generation')}**")
@@ -232,7 +232,7 @@ class ImageToVideoPipelineUI(PipelineUI):
                 st.button(
                     tr("btn.generate"),
                     type="primary",
-                    use_container_width=True,
+                    width="stretch",
                     disabled=True,
                     key="audio_visual_generate_disabled"
                 )
@@ -243,14 +243,14 @@ class ImageToVideoPipelineUI(PipelineUI):
                 st.button(
                     tr("btn.generate"),
                     type="primary",
-                    use_container_width=True,
+                    width="stretch",
                     disabled=True,
                     key="audio_visual_generate"
                 )
                 return
 
             # Generate button
-            if st.button(tr("btn.generate"), type="primary", use_container_width=True, key="i2v_generate"):
+            if st.button(tr("btn.generate"), type="primary", width="stretch", key="i2v_generate"):
                 if not config_manager.validate():
                     st.error(tr("settings.not_configured"))
                     st.stop()
@@ -283,13 +283,13 @@ class ImageToVideoPipelineUI(PipelineUI):
                                 "image_path": image_path,
                                 "output_path": final_video_path,
                             }
-                            media_result = await pixelle_video.media(
+                            media_result = await lumina_video.media(
                                 **media_params,
                             )
                             progress_bar.progress(100)
                             status_text.text(tr("status.success"))
                             await save_web_generation_history(
-                                pixelle_video,
+                                lumina_video,
                                 task_id=task_id,
                                 video_path=media_result.url,
                                 pipeline="image_to_video",
@@ -304,7 +304,7 @@ class ImageToVideoPipelineUI(PipelineUI):
                             )
                             return media_result.url
 
-                        kit = await pixelle_video._get_or_create_comfykit()
+                        kit = await lumina_video._get_or_create_comfykit()
 
                         workflow_path = Path("workflows") / workflow_key
 
@@ -349,7 +349,7 @@ class ImageToVideoPipelineUI(PipelineUI):
                         progress_bar.progress(100)
                         status_text.text(tr("status.success"))
                         await save_web_generation_history(
-                            pixelle_video,
+                            lumina_video,
                             task_id=task_id,
                             video_path=final_video_path,
                             pipeline="image_to_video",
@@ -398,7 +398,7 @@ class ImageToVideoPipelineUI(PipelineUI):
                                 data=video_bytes,
                                 file_name=video_filename,
                                 mime="video/mp4",
-                                use_container_width=True
+                                width="stretch"
                             )
                     else:
                         st.error(tr("status.video_not_found", path=final_video_path))

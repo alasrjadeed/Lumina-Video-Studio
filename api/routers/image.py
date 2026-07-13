@@ -1,4 +1,4 @@
-# Copyright (C) 2025 AIDC-AI
+# Copyright (C) 2025 Lumina AI
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ Image generation endpoints
 from fastapi import APIRouter, HTTPException
 from loguru import logger
 
-from api.dependencies import PixelleVideoDep
+from api.dependencies import LuminaVideoDep
 from api.schemas.image import ImageGenerateRequest, ImageGenerateResponse
 
 router = APIRouter(prefix="/image", tags=["Basic Services"])
@@ -26,7 +26,7 @@ router = APIRouter(prefix="/image", tags=["Basic Services"])
 @router.post("/generate", response_model=ImageGenerateResponse)
 async def image_generate(
     request: ImageGenerateRequest,
-    pixelle_video: PixelleVideoDep
+    lumina_video: LuminaVideoDep
 ):
     """
     Image generation endpoint
@@ -44,7 +44,7 @@ async def image_generate(
         logger.info(f"Image generation request: {request.prompt[:50]}...")
         
         # Call media service (backward compatible with image API)
-        media_result = await pixelle_video.media(
+        media_result = await lumina_video.media(
             prompt=request.prompt,
             width=request.width,
             height=request.height,

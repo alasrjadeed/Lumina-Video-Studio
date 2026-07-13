@@ -1,4 +1,4 @@
-# Copyright (C) 2025 AIDC-AI
+# Copyright (C) 2025 Lumina AI
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class TTSSynthesizeRequest(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "text": "Hello, welcome to Pixelle-Video!",
+                "text": "Hello, welcome to Lumina Video Studio!",
                 "workflow": "runninghub/tts_edge.json",
                 "ref_audio": None
             }

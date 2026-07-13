@@ -1,4 +1,4 @@
-# Copyright (C) 2025 AIDC-AI
+# Copyright (C) 2025 Lumina AI
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ class HealthResponse(BaseModel):
     """Health check response"""
     status: str = "healthy"
     version: str = "0.1.0"
-    service: str = "Pixelle-Video API"
+    service: str = "Lumina Video Studio API"
 
 
 class CapabilitiesResponse(BaseModel):

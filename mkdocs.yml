@@ -1,13 +1,13 @@
-site_name: Pixelle-Video
+site_name: Lumina Video Studio
 site_description: AI Video Creator - Generate a short video in 3 minutes
-site_author: Pixelle.AI
-site_url: https://AIDC-AI.github.io/Pixelle-Video/
+site_author: Lumina AI
+site_url: https://LuminaAI.github.io/Lumina-Video-Studio/
 
-repo_name: AIDC-AI/Pixelle-Video
-repo_url: https://github.com/AIDC-AI/Pixelle-Video
+repo_name: LuminaAI/Lumina-Video-Studio
+repo_url: https://github.com/LuminaAI/Lumina-Video-Studio
 edit_uri: edit/main/docs/
 
-copyright: Copyright &copy; 2025 Pixelle.AI
+copyright: Copyright &copy; 2025 Lumina AI
 
 theme:
   name: material
@@ -164,7 +164,7 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/AIDC-AI/Pixelle-Video
+      link: https://github.com/LuminaAI/Lumina-Video-Studio
       name: GitHub Repository
 
 extra_css:

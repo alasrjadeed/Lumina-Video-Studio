@@ -1,9 +1,9 @@
 #!/bin/bash
-# Pixelle-Video Docker Quick Start Script
+# Lumina Video Studio Docker Quick Start Script
 
 set -e
 
-echo "🐳 Pixelle-Video Docker Deployment"
+echo "🐳 Lumina Video Studio Docker Deployment"
 echo "=================================="
 echo ""
 
@@ -63,7 +63,7 @@ echo "⏳ Waiting for services to be ready..."
 sleep 5
 
 echo ""
-echo "✅ Pixelle-Video is now running!"
+echo "✅ Lumina Video Studio is now running!"
 echo ""
 echo "Services:"
 echo "  🌐 Web UI:  http://localhost:8501"

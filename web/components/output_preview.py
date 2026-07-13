@@ -23,24 +23,24 @@ from loguru import logger
 
 from web.i18n import tr, get_language
 from web.utils.async_helpers import run_async
-from pixelle_video.models.progress import ProgressEvent
-from pixelle_video.config import config_manager
+from lumina_video.models.progress import ProgressEvent
+from lumina_video.config import config_manager
 
 
-def render_output_preview(pixelle_video, video_params):
+def render_output_preview(lumina_video, video_params):
     """Render output preview section (right column)"""
     # Check if batch mode
     is_batch = video_params.get("batch_mode", False)
     
     if is_batch:
         # Batch generation mode
-        render_batch_output(pixelle_video, video_params)
+        render_batch_output(lumina_video, video_params)
     else:
         # Single video generation mode (original logic)
-        render_single_output(pixelle_video, video_params)
+        render_single_output(lumina_video, video_params)
 
 
-def render_single_output(pixelle_video, video_params):
+def render_single_output(lumina_video, video_params):
     """Render single video generation output (original logic, unchanged)"""
     # Extract parameters from video_params dict
     text = video_params.get("text", "")
@@ -71,7 +71,7 @@ def render_single_output(pixelle_video, video_params):
             st.warning(tr("settings.not_configured"))
         
         # Generate Button
-        if st.button(tr("btn.generate"), type="primary", use_container_width=True):
+        if st.button(tr("btn.generate"), type="primary", width="stretch"):
             # Validate system configuration
             if not config_manager.validate():
                 st.error(tr("settings.not_configured"))
@@ -82,7 +82,7 @@ def render_single_output(pixelle_video, video_params):
                 st.error(tr("error.input_required"))
                 st.stop()
 
-            from pixelle_video.utils.template_util import get_template_type
+            from lumina_video.utils.template_util import get_template_type
             if frame_template and get_template_type(frame_template) == "video" and not workflow_key:
                 st.error(
                     "请选择视频生成工作流或 API 视频模型后再生成。"
@@ -165,7 +165,7 @@ def render_single_output(pixelle_video, video_params):
                 if custom_values_for_video:
                     video_params["template_params"] = custom_values_for_video
                 
-                result = run_async(pixelle_video.generate_video(**video_params))
+                result = run_async(lumina_video.generate_video(**video_params))
                 
                 # Calculate total generation time
                 total_generation_time = time.time() - start_time
@@ -182,7 +182,7 @@ def render_single_output(pixelle_video, video_params):
                 file_size_mb = result.file_size / (1024 * 1024)
                 
                 # Parse video size from template path
-                from pixelle_video.utils.template_util import parse_template_size, resolve_template_path
+                from lumina_video.utils.template_util import parse_template_size, resolve_template_path
                 template_path = resolve_template_path(result.storyboard.config.frame_template)
                 video_width, video_height = parse_template_size(template_path)
                 
@@ -209,7 +209,7 @@ def render_single_output(pixelle_video, video_params):
                             data=video_bytes,
                             file_name=video_filename,
                             mime="video/mp4",
-                            use_container_width=True
+                            width="stretch"
                         )
                 else:
                     st.error(tr("status.video_not_found", path=result.video_path))
@@ -222,7 +222,7 @@ def render_single_output(pixelle_video, video_params):
                 st.stop()
 
 
-def render_batch_output(pixelle_video, video_params):
+def render_batch_output(lumina_video, video_params):
     """Render batch generation output (minimal, redirect to History)"""
     topics = video_params.get("topics", [])
     
@@ -252,7 +252,7 @@ def render_batch_output(pixelle_video, video_params):
         if st.button(
             tr("batch.generate_button", count=batch_count),
             type="primary",
-            use_container_width=True,
+            width="stretch",
             help=tr("batch.generate_help")
         ):
             # Prepare shared config
@@ -349,7 +349,7 @@ def render_batch_output(pixelle_video, video_params):
             start_time = time.time()
             
             batch_result = batch_manager.execute_batch(
-                pixelle_video=pixelle_video,
+                lumina_video=lumina_video,
                 topics=topics,
                 shared_config=shared_config,
                 overall_progress_callback=update_overall_progress,

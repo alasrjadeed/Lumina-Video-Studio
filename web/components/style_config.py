@@ -32,7 +32,7 @@ from web.pipelines.api_workflows import (
     workflow_source_help,
     workflow_source_label,
 )
-from pixelle_video.config import config_manager
+from lumina_video.config import config_manager
 
 
 def is_api_workflow(workflow_key: str | None) -> bool:
@@ -40,7 +40,7 @@ def is_api_workflow(workflow_key: str | None) -> bool:
     return bool(workflow_key and workflow_key.startswith("api/"))
 
 
-def render_style_config(pixelle_video):
+def render_style_config(lumina_video):
     """Render style configuration section (middle column)"""
     # TTS Section (moved from left column)
     # ====================================================================
@@ -78,7 +78,7 @@ def render_style_config(pixelle_video):
         # ================================================================
         if tts_mode == "local":
             # Import voice configuration
-            from pixelle_video.tts_voices import EDGE_TTS_VOICES, get_voice_display_name
+            from lumina_video.tts_voices import EDGE_TTS_VOICES, get_voice_display_name
             
             # Get saved voice from config
             local_config = tts_config.get("local", {})
@@ -138,7 +138,7 @@ def render_style_config(pixelle_video):
         # ================================================================
         else:  # comfyui mode
             # Get available TTS workflows
-            tts_workflows = pixelle_video.tts.list_workflows()
+            tts_workflows = lumina_video.tts.list_workflows()
             
             # Build options for selectbox
             tts_workflow_options = [wf["display_name"] for wf in tts_workflows]
@@ -206,7 +206,7 @@ def render_style_config(pixelle_video):
             )
             
             # Preview button
-            if st.button(tr("tts.preview_button"), key="preview_tts", use_container_width=True):
+            if st.button(tr("tts.preview_button"), key="preview_tts", width="stretch"):
                 with st.spinner(tr("tts.previewing")):
                     try:
                         # Build TTS params based on mode
@@ -223,7 +223,7 @@ def render_style_config(pixelle_video):
                             if ref_audio_path:
                                 tts_params["ref_audio"] = str(ref_audio_path)
                         
-                        audio_path = run_async(pixelle_video.tts(**tts_params))
+                        audio_path = run_async(lumina_video.tts(**tts_params))
                         
                         # Play the audio
                         if audio_path:
@@ -299,7 +299,7 @@ def render_style_config(pixelle_video):
         current_lang = get_language()
         
         # Import template utilities
-        from pixelle_video.utils.template_util import get_templates_grouped_by_size_and_type, get_template_type
+        from lumina_video.utils.template_util import get_templates_grouped_by_size_and_type, get_template_type
         
         # Template type selector
         st.markdown(f"**{tr('template.type_selector')}**")
@@ -344,7 +344,7 @@ def render_style_config(pixelle_video):
         }
         
         # Get default template from config
-        template_config = pixelle_video.config.get("template", {})
+        template_config = lumina_video.config.get("template", {})
         config_default_template = template_config.get("default_template", "1080x1920/image_default.html")
 
         # Backward compatibility
@@ -440,7 +440,7 @@ def render_style_config(pixelle_video):
                                 
                                 # Display preview image or placeholder
                                 if preview_path and os.path.exists(preview_path):
-                                    st.image(preview_path, use_container_width=True)
+                                    st.image(preview_path, width="stretch")
                                 else:
                                     # Placeholder for templates without preview (fixed height, compact layout)
                                     st.markdown(
@@ -480,7 +480,7 @@ def render_style_config(pixelle_video):
                                 if st.button(
                                     button_label,
                                     key=f"template_{template.template_path}",
-                                    use_container_width=True,
+                                    width="stretch",
                                     type=button_type,
                                 ):
                                     st.session_state['selected_template'] = template.template_path
@@ -506,14 +506,14 @@ def render_style_config(pixelle_video):
         
 
         # Display video size from template
-        from pixelle_video.utils.template_util import parse_template_size
+        from lumina_video.utils.template_util import parse_template_size
         video_width, video_height = parse_template_size(frame_template)
         st.caption(tr("template.video_size_info", width=video_width, height=video_height))
         
         # Custom template parameters (for video generation)
-        from pixelle_video.services.frame_html import HTMLFrameGenerator
+        from lumina_video.services.frame_html import HTMLFrameGenerator
         # Resolve template path to support both data/templates/ and templates/
-        from pixelle_video.utils.template_util import resolve_template_path
+        from lumina_video.utils.template_util import resolve_template_path
         template_path_for_params = resolve_template_path(frame_template)
         generator_for_params = HTMLFrameGenerator(template_path_for_params)
         custom_params_for_video = generator_for_params.parse_template_parameters()
@@ -524,7 +524,7 @@ def render_style_config(pixelle_video):
         st.session_state['template_media_height'] = media_height
         
         # Detect template media type
-        from pixelle_video.utils.template_util import get_template_type
+        from lumina_video.utils.template_util import get_template_type
         
         template_name = Path(frame_template).name
         template_media_type = get_template_type(template_name)
@@ -637,18 +637,18 @@ def render_style_config(pixelle_video):
                 )
             
             # Info: Size is auto-determined from template
-            from pixelle_video.utils.template_util import parse_template_size, resolve_template_path
+            from lumina_video.utils.template_util import parse_template_size, resolve_template_path
             template_width, template_height = parse_template_size(resolve_template_path(frame_template))
             st.info(f"📐 {tr('template.size_info')}: {template_width} × {template_height}")
             
             # Preview button
-            if st.button(tr("template.preview_button"), key="btn_preview_template", use_container_width=True):
+            if st.button(tr("template.preview_button"), key="btn_preview_template", width="stretch"):
                 with st.spinner(tr("template.preview_generating")):
                     try:
-                        from pixelle_video.services.frame_html import HTMLFrameGenerator
+                        from lumina_video.services.frame_html import HTMLFrameGenerator
 
                         # Use the currently selected template (size is auto-parsed)
-                        from pixelle_video.utils.template_util import resolve_template_path
+                        from lumina_video.utils.template_util import resolve_template_path
                         template_path = resolve_template_path(frame_template)
                         generator = HTMLFrameGenerator(template_path)
                         
@@ -740,22 +740,22 @@ def render_style_config(pixelle_video):
             if workflow_source == "api":
                 if template_media_type == "video":
                     workflows = list_api_media_workflows(
-                        pixelle_video,
+                        lumina_video,
                         "video",
                         required_adapter_abilities=["text_to_video"],
                         verified_only=True,
                     )
                 else:
-                    workflows = list_api_media_workflows(pixelle_video, "image")
+                    workflows = list_api_media_workflows(lumina_video, "image")
             elif template_media_type == "video":
                 workflows = list_local_media_workflows(
-                    pixelle_video,
+                    lumina_video,
                     "video",
                     workflow_source,
                     key_contains="video_",
                 )
             else:
-                workflows = list_local_media_workflows(pixelle_video, "image", workflow_source)
+                workflows = list_local_media_workflows(lumina_video, "image", workflow_source)
         
             # Build options for selectbox
             # Display: "image_flux.json - Runninghub"
@@ -856,7 +856,7 @@ def render_style_config(pixelle_video):
             
                 # Preview button
                 preview_button_label = tr("style.video_preview") if template_media_type == "video" else tr("style.preview")
-                if st.button(preview_button_label, key="preview_style", use_container_width=True):
+                if st.button(preview_button_label, key="preview_style", width="stretch"):
                     if not workflow_key:
                         st.error(
                             "请先选择可用的工作流或模型。"
@@ -867,7 +867,7 @@ def render_style_config(pixelle_video):
                     previewing_text = tr("style.video_previewing") if template_media_type == "video" else tr("style.previewing")
                     with st.spinner(previewing_text):
                         try:
-                            from pixelle_video.utils.prompt_helper import build_image_prompt
+                            from lumina_video.utils.prompt_helper import build_image_prompt
                         
                             # Build final prompt with prefix
                             final_prompt = build_image_prompt(test_prompt, prompt_prefix)
@@ -875,7 +875,7 @@ def render_style_config(pixelle_video):
                             preview_params = dict(api_video_params) if template_media_type == "video" else {}
 
                             # Generate preview media with the selected source only.
-                            media_result = run_async(pixelle_video.media(
+                            media_result = run_async(lumina_video.media(
                                 prompt=final_prompt,
                                 workflow=workflow_key,
                                 media_type=template_media_type,

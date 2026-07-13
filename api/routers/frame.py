@@ -1,4 +1,4 @@
-# Copyright (C) 2025 AIDC-AI
+# Copyright (C) 2025 Lumina AI
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ Frame/Template rendering endpoints
 from fastapi import APIRouter, HTTPException
 from loguru import logger
 
-from api.dependencies import PixelleVideoDep
+from api.dependencies import LuminaVideoDep
 from api.schemas.frame import FrameRenderRequest, FrameRenderResponse, TemplateParamsResponse
-from pixelle_video.services.frame_html import HTMLFrameGenerator
-from pixelle_video.utils.template_util import parse_template_size, resolve_template_path
+from lumina_video.services.frame_html import HTMLFrameGenerator
+from lumina_video.utils.template_util import parse_template_size, resolve_template_path
 
 router = APIRouter(prefix="/frame", tags=["Frame Rendering"])
 
@@ -28,7 +28,7 @@ router = APIRouter(prefix="/frame", tags=["Frame Rendering"])
 @router.post("/render", response_model=FrameRenderResponse)
 async def render_frame(
     request: FrameRenderRequest,
-    pixelle_video: PixelleVideoDep
+    lumina_video: LuminaVideoDep
 ):
     """
     Render a single frame using HTML template

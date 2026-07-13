@@ -1,4 +1,4 @@
-# Copyright (C) 2025 AIDC-AI
+# Copyright (C) 2025 Lumina AI
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ LLM (Large Language Model) endpoints
 from fastapi import APIRouter, HTTPException
 from loguru import logger
 
-from api.dependencies import PixelleVideoDep
+from api.dependencies import LuminaVideoDep
 from api.schemas.llm import LLMChatRequest, LLMChatResponse
 
 router = APIRouter(prefix="/llm", tags=["Basic Services"])
@@ -26,7 +26,7 @@ router = APIRouter(prefix="/llm", tags=["Basic Services"])
 @router.post("/chat", response_model=LLMChatResponse)
 async def llm_chat(
     request: LLMChatRequest,
-    pixelle_video: PixelleVideoDep
+    lumina_video: LuminaVideoDep
 ):
     """
     LLM chat endpoint
@@ -43,7 +43,7 @@ async def llm_chat(
         logger.info(f"LLM chat request: {request.prompt[:50]}...")
         
         # Call LLM service
-        response = await pixelle_video.llm(
+        response = await lumina_video.llm(
             prompt=request.prompt,
             temperature=request.temperature,
             max_tokens=request.max_tokens

@@ -1,28 +1,28 @@
-<h1 align="center">🎬 Pixelle-Video —— AI Fully Automated Short Video Engine</h1>
+<h1 align="center">🎬 Lumina Video Studio — AI Fully Automated Short Video Engine</h1>
 
 <p align="center"><b>English</b> | <a href="README.md">中文</a></p>
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=uUkx-lRxLjc" target="_blank"><img src="https://img.shields.io/badge/🎥 Video%20Tutorial-EA4C89" alt="Video Tutorial"></a>
-  <a href="https://github.com/AIDC-AI/Pixelle-Video/releases" target="_blank"><img src="https://img.shields.io/badge/📦 Windows-50C878" alt="Windows Package"></a>
-  <a href="https://aidc-ai.github.io/Pixelle-Video" target="_blank"><img src="https://img.shields.io/badge/📘 Documentation-4A90E2" alt="Documentation"></a>
-  <a href="https://github.com/AIDC-AI/Pixelle-Video/stargazers"><img src="https://img.shields.io/github/stars/AIDC-AI/Pixelle-Video.svg" alt="Stargazers"></a>
-  <a href="https://github.com/AIDC-AI/Pixelle-Video/issues"><img src="https://img.shields.io/github/issues/AIDC-AI/Pixelle-Video.svg" alt="Issues"></a>
-  <a href="https://github.com/AIDC-AI/Pixelle-Video/network/members"><img src="https://img.shields.io/github/forks/AIDC-AI/Pixelle-Video.svg" alt="Forks"></a>
-  <a href="https://github.com/AIDC-AI/Pixelle-Video/blob/main/LICENSE"><img src="https://img.shields.io/github/license/AIDC-AI/Pixelle-Video.svg" alt="License"></a>
+  <img src="resources/lumina-logo.png" alt="Lumina Video Studio Logo" width="200"/>
 </p>
 
-https://github.com/user-attachments/assets/a42e7457-fcc8-40da-83fc-784c45a8b95d
+<p align="center">
+  <a href="https://github.com/LuminaAI/Lumina-Video-Studio/stargazers"><img src="https://img.shields.io/github/stars/LuminaAI/Lumina-Video-Studio.svg" alt="Stargazers"></a>
+  <a href="https://github.com/LuminaAI/Lumina-Video-Studio/issues"><img src="https://img.shields.io/github/issues/LuminaAI/Lumina-Video-Studio.svg" alt="Issues"></a>
+  <a href="https://github.com/LuminaAI/Lumina-Video-Studio/network/members"><img src="https://img.shields.io/github/forks/LuminaAI/Lumina-Video-Studio.svg" alt="Forks"></a>
+  <a href="https://github.com/LuminaAI/Lumina-Video-Studio/blob/main/LICENSE"><img src="https://img.shields.io/github/license/LuminaAI/Lumina-Video-Studio.svg" alt="License"></a>
+</p>
 
-Just input a **topic**, and Pixelle-Video will automatically:
+<br/>
+
+Just input a **topic**, and Lumina Video Studio will automatically:
 - ✍️ Write video script
-- 🎨 Generate AI images/videos  
+- 🎨 Generate AI images/videos
 - 🗣️ Synthesize voice narration
 - 🎵 Add background music
 - 🎬 Create video with one click
 
-
-**Zero threshold, zero editing experience** - Make video creation as simple as typing a sentence!
+**Zero threshold, zero editing experience** — Make video creation as simple as typing a sentence!
 
 
 ## 🖥️ Web Interface Preview
@@ -33,7 +33,7 @@ Just input a **topic**, and Pixelle-Video will automatically:
 ## 📋 Recent Updates
 
 - ✅ **2026-06-01**: Added direct API media model configuration in WebUI, including image/video provider credentials, Base URLs, and per-provider proxy toggles
-- ✅ **2026-01-26**: Added the Motion Transfer pipeline — upload a reference video and an image to transfer motion.
+- ✅ **2026-01-26**: Added the Motion Transfer pipeline — upload a reference video and an image to transfer motion
 - ✅ **2026-01-14**: Added "Digital Human" and "Image-to-Video" pipelines, multi-language TTS voices support
 - ✅ **2026-01-06**: Added RunningHub 48G VRAM machine support
 - ✅ **2025-12-28**: Configurable RunningHub concurrency limit, improved LLM structured data response handling
@@ -42,28 +42,28 @@ Just input a **topic**, and Pixelle-Video will automatically:
 - ✅ **2025-12-08**: Support multiple script split modes (paragraph/line/sentence), improved template selection with direct preview
 - ✅ **2025-12-06**: Fixed video generation API URL path handling with cross-platform compatibility
 - ✅ **2025-12-05**: Added Windows all-in-one package download, optimized image and video analysis workflows
-- ✅ **2025-12-04**: New "Custom Media" feature - upload your photos/videos with AI-powered analysis and script generation
+- ✅ **2025-12-04**: New "Custom Media" feature — upload your photos/videos with AI-powered analysis and script generation
 - ✅ **2025-11-18**: Parallel processing for RunningHub, added history page, batch video task creation support
 
 
 ## ✨ Key Features
 
-- ✅ **Fully Automatic Generation** - Input a topic, automatically generate complete video
-- ✅ **AI Smart Copywriting** - Intelligently create narration based on topic, no need to write scripts yourself
-- ✅ **AI Generated Images** - Each sentence comes with beautiful AI illustrations
-- ✅ **AI Generated Videos** - Support AI video generation models (like WAN 2.1) to create dynamic video content
-- ✅ **Direct Model APIs** - Directly call image/video generation services from DashScope, OpenAI, Seedream, Seedance, Kling, and more
-- ✅ **AI Generated Voice** - Support Edge-TTS, Index-TTS and many other mainstream TTS solutions
-- ✅ **Background Music** - Support adding BGM to make videos more atmospheric
-- ✅ **Visual Styles** - Multiple templates to choose from, create unique video styles
-- ✅ **Flexible Dimensions** - Support portrait, landscape and other video dimensions
-- ✅ **Multiple AI Models** - Support GPT, Qwen, DeepSeek, Ollama and more
-- ✅ **Flexible Atomic Capability Combination** - Supports ComfyUI / RunningHub workflows and direct API models, allowing image, video, TTS, VLM and other capabilities to be swapped as needed
+- ✅ **Fully Automatic Generation** — Input a topic, automatically generate complete video
+- ✅ **AI Smart Copywriting** — Intelligently create narration based on topic, no need to write scripts yourself
+- ✅ **AI Generated Images** — Each sentence comes with beautiful AI illustrations
+- ✅ **AI Generated Videos** — Support AI video generation models (like WAN 2.1) to create dynamic video content
+- ✅ **Direct Model APIs** — Directly call image/video generation services from DashScope, OpenAI, Seedream, Seedance, Kling, and more
+- ✅ **AI Generated Voice** — Support Edge-TTS, Index-TTS and many other mainstream TTS solutions
+- ✅ **Background Music** — Support adding BGM to make videos more atmospheric
+- ✅ **Visual Styles** — Multiple templates to choose from, create unique video styles
+- ✅ **Flexible Dimensions** — Support portrait, landscape and other video dimensions
+- ✅ **Multiple AI Models** — Support GPT, Qwen, DeepSeek, Ollama and more
+- ✅ **Flexible Atomic Capability Combination** — Supports ComfyUI / RunningHub workflows and direct API models, allowing image, video, TTS, VLM and other capabilities to be swapped as needed
 
 
 ## 📊 Video Generation Pipeline
 
-Pixelle-Video adopts a modular design, the entire video generation process is clear and concise:
+Lumina Video Studio adopts a modular design, the entire video generation process is clear and concise:
 
 ![Video Generation Flow](resources/flow_en.png)
 
@@ -74,7 +74,7 @@ Each step supports flexible customization, allowing you to choose different AI m
 
 ## 🎬 Video Examples
 
-Here are actual cases generated using Pixelle-Video, showcasing video effects with different themes and styles:
+Here are actual cases generated using Lumina Video Studio, showcasing video effects with different themes and styles:
 
 ### 📱 Extension Module Video Showcase
 
@@ -103,51 +103,51 @@ Here are actual cases generated using Pixelle-Video, showcasing video effects wi
 <table>
 <tr>
 <td width="33%">
-<h3>🌄 Documentary & Lifestyle – Default Template</h3>
+<h3>🌄 Documentary & Lifestyle — Default Template</h3>
 <video src="https://github.com/user-attachments/assets/e6716c1d-78de-453d-84c2-10873c8c595f" controls width="100%"></video>
 <p align="center"><b>The Scenery Along the Journey</b></p>
 </td>
 <td width="33%">
-<h3>🔍 Cultural Deconstruction – Default Template</h3>
+<h3>🔍 Cultural Deconstruction — Default Template</h3>
 <video src="https://github.com/user-attachments/assets/f5de75f6-135a-4ab4-9f5f-079f649764d5" controls width="100%"></video>
 <p align="center"><b>Santa ID</b></p>
 </td>
 <td width="33%">
-<h3>🔭 Scientific Inquiry – Default Template</h3>
+<h3>🔭 Scientific Inquiry — Default Template</h3>
 <video src="https://github.com/user-attachments/assets/ceb8b0df-8331-4e1f-88e7-db5b295a1c1d" controls width="100%"></video>
-<p align="center"><b>Why Haven’t We Found Alien Civilizations Yet?</b></p>
+<p align="center"><b>Why Haven't We Found Alien Civilizations Yet?</b></p>
 </td>
 </tr>
 <tr>
 <td width="33%">
-<h3>🌱 Personal Growth – Cloned Voice</h3>
+<h3>🌱 Personal Growth — Cloned Voice</h3>
 <video src="https://github.com/user-attachments/assets/1bad9a49-df83-4905-9cc8-9a7640e9c7d8" controls width="100%"></video>
 <p align="center"><b>How to Level Up Yourself</b></p>
 </td>
 <td width="33%">
-<h3>🧠 Deep Thinking – Default Template</h3>
+<h3>🧠 Deep Thinking — Default Template</h3>
 <video src="https://github.com/user-attachments/assets/663b705a-2aea-44bc-b266-4bb27aa255a8" controls width="100%"></video>
 <p align="center"><b>Understanding Antifragility</b></p>
 </td>
 <td width="33%">
-<h3>🏯 History & Culture – Static Frame</h3>
+<h3>🏯 History & Culture — Static Frame</h3>
 <video src="https://github.com/user-attachments/assets/56e0a018-fa99-47eb-a97f-fc2fa8915724" controls width="100%"></video>
-<p align="center"><b>Zizhi Tongjian (Comprehensive Mirror for Aid in Governance)</b></p>
+<p align="center"><b>Zizhi Tongjian</b></p>
 </td>
 </tr>
 <tr>
 <td width="33%">
-<h3>☀️ Emotional Storytelling – Cloned Voice</h3>
+<h3>☀️ Emotional Storytelling — Cloned Voice</h3>
 <video src="https://github.com/user-attachments/assets/4687df95-dd21-4a7b-b01e-f33a7b646644" controls width="100%"></video>
 <p align="center"><b>Winter Sunlight</b></p>
 </td>
 <td width="33%">
-<h3>📜 Novel Adaptation – Custom Script</h3>
+<h3>📜 Novel Adaptation — Custom Script</h3>
 <video src="https://github.com/user-attachments/assets/d354465e-3fa8-40b4-93e9-61ad75ef0697" controls width="100%"></video>
-<p align="center"><b>Doupo Cangqiong (Battle Through the Heavens)</b></p>
+<p align="center"><b>Battle Through the Heavens</b></p>
 </td>
 <td width="33%">
-<h3>🧬 Knowledge Explainer – Qwen Image Generation</h3>
+<h3>🧬 Knowledge Explainer — Qwen Image Generation</h3>
 <video src="https://github.com/user-attachments/assets/8ac21768-41ce-4d41-acdd-e3dd3eb9725a" controls width="100%"></video>
 <p align="center"><b>Essential Wellness Tips</b></p>
 </td>
@@ -159,12 +159,12 @@ Here are actual cases generated using Pixelle-Video, showcasing video effects wi
 <table>
 <tr>
 <td width="50%">
-<h3>💰 Side Hustle Money Making - Movie Template</h3>
+<h3>💰 Side Hustle — Movie Template</h3>
 <video src="https://github.com/user-attachments/assets/c9209d4e-73a6-4b82-aaad-cf102248c9e2" controls width="100%"></video>
 <p align="center"><b>Side Hustle Money Making</b></p>
 </td>
 <td width="50%">
-<h3>🏛️ Historical Commentary - Custom Template</h3>
+<h3>🏛️ Historical Commentary — Custom Template</h3>
 <video src="https://github.com/user-attachments/assets/a767c452-d5f1-4cff-bb34-b80fff0d4c3e" controls width="100%"></video>
 <p align="center"><b>Insights from Zizhi Tongjian</b></p>
 </td>
@@ -179,9 +179,9 @@ Here are actual cases generated using Pixelle-Video, showcasing video effects wi
 
 ### 🪟 Windows All-in-One Package (Recommended for Windows Users)
 
-**No need to install Python, uv, or ffmpeg - ready to use out of the box!**
+**No need to install Python, uv, or ffmpeg — ready to use out of the box!**
 
-👉 **[Download Windows All-in-One Package](https://github.com/AIDC-AI/Pixelle-Video/releases/latest)**
+👉 **[Download Windows All-in-One Package](https://github.com/LuminaAI/Lumina-Video-Studio/releases/latest)**
 
 1. Download the latest Windows All-in-One Package and extract it
 2. Double-click `start.bat` to launch the Web interface
@@ -200,7 +200,7 @@ Before starting, you need to install Python package manager `uv` and video proce
 
 ##### Install uv
 
-Please visit the uv official documentation to see the installation method for your system:  
+Please visit the uv official documentation to see the installation method for your system:
 👉 **[uv Installation Guide](https://docs.astral.sh/uv/getting-started/installation/)**
 
 After installation, run `uv --version` in the terminal to verify successful installation.
@@ -228,8 +228,8 @@ After installation, run `ffmpeg -version` in the terminal to verify successful i
 #### Step 1: Clone Project
 
 ```bash
-git clone https://github.com/AIDC-AI/Pixelle-Video.git
-cd Pixelle-Video
+git clone https://github.com/LuminaAI/Lumina-Video-Studio.git
+cd Lumina-Video-Studio
 ```
 
 #### Step 2: Launch Web Interface
@@ -264,12 +264,12 @@ Configuration is required on first use. Click to expand the "⚙️ System Confi
 #### 1. LLM Configuration (Large Language Model)
 Used for generating video scripts.
 
-**Quick Select Preset**  
+**Quick Select Preset**
 - Select preset model from dropdown menu (Qwen, GPT-4o, DeepSeek, etc.)
 - After selection, base_url and model will be automatically filled
 - Click "🔑 Get API Key" link to register and obtain key
 
-**Manual Configuration**  
+**Manual Configuration**
 - API Key: Enter your key
 - Base URL: API address
 - Model: Model name
@@ -277,11 +277,11 @@ Used for generating video scripts.
 #### 2. ComfyUI / RunningHub Configuration
 Used for generating video images, video clips, or voices through ComfyUI workflows.
 
-**Local Deployment (Recommended)**  
+**Local Deployment (Recommended)**
 - ComfyUI URL: Local ComfyUI service address (default http://127.0.0.1:8188)
 - Click "Test Connection" to confirm service is available
 
-**Cloud Deployment**  
+**Cloud Deployment**
 - RunningHub API Key: Cloud image generation service key
 
 #### 3. API Media Model Configuration
@@ -343,19 +343,19 @@ After configuration, click "Save Configuration".
 #### Image Generation
 Determine what style of images AI generates.
 
-**ComfyUI Workflow**  
+**ComfyUI Workflow**
 - Select image generation workflow from dropdown menu
 - Supports local deployment (selfhost) and cloud (RunningHub) workflows
 - Also supports `api/...` direct image model workflows after configuring the corresponding provider credentials
 - Default uses `image_flux.json`
 - If you know ComfyUI, you can put your own workflows in the `workflows/` folder
 
-**Image Dimensions**  
+**Image Dimensions**
 - Set width and height of generated images (unit: pixels)
 - Default 1024x1024, can be adjusted as needed
 - Note: Different models have different dimension limitations
 
-**Prompt Prefix**  
+**Prompt Prefix**
 - Controls overall image style (language needs to be English)
 - Example: Minimalist black-and-white matchstick figure style illustration, clean lines, simple sketch style
 - Click "Preview Style" to test effect
@@ -363,16 +363,16 @@ Determine what style of images AI generates.
 #### Video Template
 Determines video layout and design.
 
-**Template Naming Convention**  
+**Template Naming Convention**
 - `static_*.html`: Static templates (no AI-generated media, text-only styles)
 - `image_*.html`: Image templates (uses AI-generated images as background)
 - `video_*.html`: Video templates (uses AI-generated videos as background)
 
-**Usage**  
+**Usage**
 - Select template from dropdown menu, displayed grouped by dimension (portrait/landscape/square)
 - Click "Preview Template" to test effect with custom parameters
 - If you know HTML, you can create your own templates in the `templates/` folder
-- 🔗 [View All Template Previews](https://aidc-ai.github.io/Pixelle-Video/user-guide/templates/#built-in-template-preview)
+- 🔗 [View All Template Previews](https://luminaai.github.io/Lumina-Video-Studio/user-guide/templates/#built-in-template-preview)
 
 #### API Video Generation
 When using dynamic video templates or extension workflows, you can generate clips through direct API video models.
@@ -402,17 +402,17 @@ When using dynamic video templates or extension workflows, you can generate clip
 
 ### ❓ FAQ
 
-**Q: How long does it take to use for the first time?**  
+**Q: How long does it take to use for the first time?**
 A: Generation time depends on the number of video frames, network conditions, and AI inference speed, typically completed within a few minutes.
 
-**Q: What if I'm not satisfied with the video?**  
+**Q: What if I'm not satisfied with the video?**
 A: You can try:
 1. Change LLM model (different models have different script styles)
 2. Adjust image dimensions and prompt prefix (change image style)
 3. Change TTS workflow or upload reference audio (change voice effect)
 4. Try different video templates and dimensions
 
-**Q: What about the cost?**  
+**Q: What about the cost?**
 A: **This project fully supports free operation!**
 
 - **Completely Free Solution**: LLM using Ollama (local) + ComfyUI local deployment = 0 cost
@@ -424,7 +424,7 @@ A: **This project fully supports free operation!**
 
 ## 🤝 Referenced Projects
 
-Pixelle-Video design is inspired by the following excellent open-source projects:
+Lumina Video Studio design is inspired by the following excellent open-source projects:
 
 - [Pixelle-MCP](https://github.com/AIDC-AI/Pixelle-MCP) - ComfyUI MCP server, allows AI assistants to directly call ComfyUI
 - [MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) - Excellent video generation tool
@@ -446,8 +446,8 @@ Scan the QR codes below to join our communities for latest updates and technical
 
 ## 📢 Feedback and Support
 
-- 🐛 **Encountered Issues**: Submit [Issue](https://github.com/AIDC-AI/Pixelle-Video/issues)
-- 💡 **Feature Suggestions**: Submit [Feature Request](https://github.com/AIDC-AI/Pixelle-Video/issues)
+- 🐛 **Encountered Issues**: Submit [Issue](https://github.com/LuminaAI/Lumina-Video-Studio/issues)
+- 💡 **Feature Suggestions**: Submit [Feature Request](https://github.com/LuminaAI/Lumina-Video-Studio/issues)
 - ⭐ **Give a Star**: If this project helps you, feel free to give a Star for support!
 
 
@@ -460,10 +460,10 @@ This project is released under the Apache License 2.0. For details, please see t
 | Framework  | Paper  |
 |:---:|---|
 | <img src="https://github.com/HITsz-TMG/VideoClaw/blob/main/FilmAgent-pics/framework.png" width="420" alt="FilmAgent framework"/> | **[SIGGRAPH Asia 2024] FilmAgent: Automating Virtual Film Production Through a Multi-Agent Collaborative Framework**<br>*Zhenran Xu, Longyue Wang, Jifang Wang, Zhouyi Li, Senbao Shi, Xue Yang, Yiyu Wang, Baotian Hu, Jun Yu, Min Zhang*<br>[[Paper](https://arxiv.org/pdf/2501.12909)] [[GitHub](https://github.com/HITsz-TMG/VideoClaw/blob/main/FilmAgent)] |
-| <img src="https://github.com/AIDC-AI/ComfyUI-Copilot/blob/main/assets/Framework-v3.png" width="420" alt="Anim-Director result"/> | **[ACL 2025] ComfyUI-Copilot: An Intelligent Assistant for Automated Workflow Development**<br>*Zhenran Xu, Xue Yang, Yiyu Wang, Qingli Hu, Zijiao Wu, Longyue Wang, Weihua Luo, Kaifu Zhang, Baotian Hu, Min Zhang*<br>[[Paper](https://aclanthology.org/2025.acl-demo.61/)] [[GitHub](https://github.com/AIDC-AI/ComfyUI-Copilot)] |
+| <img src="https://github.com/AIDC-AI/ComfyUI-Copilot/blob/main/assets/Framework-v3.png" width="420" alt="ComfyUI-Copilot framework"/> | **[ACL 2025] ComfyUI-Copilot: An Intelligent Assistant for Automated Workflow Development**<br>*Zhenran Xu, Xue Yang, Yiyu Wang, Qingli Hu, Zijiao Wu, Longyue Wang, Weihua Luo, Kaifu Zhang, Baotian Hu, Min Zhang*<br>[[Paper](https://aclanthology.org/2025.acl-demo.61/)] [[GitHub](https://github.com/AIDC-AI/ComfyUI-Copilot)] |
 | <img src="https://raw.githubusercontent.com/HITsz-TMG/Anim-Director/main/AniMaker/assets/pipeline.png" width="420" alt="AniMaker pipeline"/> | **[SIGGRAPH Asia 2025] AniMaker: Multi-Agent Animated Storytelling with MCTS-Driven Clip Generation**<br>*Haoyuan Shi, Yunxin Li, Xinyu Chen, Longyue Wang, Baotian Hu, Min Zhang*<br>[[Paper](https://doi.org/10.1145/3757377.3764009)] [[GitHub](https://github.com/HITsz-TMG/Anim-Director/tree/main/AniMaker)] |
 
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=AIDC-AI/Pixelle-Video&type=Date)](https://star-history.com/#AIDC-AI/Pixelle-Video&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=LuminaAI/Lumina-Video-Studio&type=Date)](https://star-history.com/#LuminaAI/Lumina-Video-Studio&Date)

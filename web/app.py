@@ -11,7 +11,7 @@
 # limitations under the License.
 
 """
-Pixelle-Video Web UI - Main Entry Point
+Lumina-Video Web UI - Main Entry Point
 
 This is the entry point for the Streamlit multi-page application.
 Uses st.navigation to define pages and set the default page to Home.
@@ -30,7 +30,7 @@ import streamlit as st
 
 # Setup page config (must be first Streamlit command)
 st.set_page_config(
-    page_title="Pixelle-Video - AI Video Generator",
+    page_title="Lumina-Video - AI Video Generator",
     page_icon="🎬",
     layout="wide",
     initial_sidebar_state="collapsed",

@@ -1,20 +1,20 @@
 # API 概览
 
-Pixelle-Video 提供 Python SDK 和 HTTP REST API 两种方式。
+Lumina Video Studio 提供 Python SDK 和 HTTP REST API 两种方式。
 
 ---
 
 ## Python SDK
 
-### PixelleVideoCore
+### LuminaVideoCore
 
 主要服务类，提供视频生成功能。
 
 ```python
-from pixelle_video.service import PixelleVideoCore
+from lumina_video.service import LuminaVideoCore
 
-pixelle = PixelleVideoCore()
-await pixelle.initialize()
+lumina = LuminaVideoCore()
+await lumina.initialize()
 ```
 
 ### generate_video()

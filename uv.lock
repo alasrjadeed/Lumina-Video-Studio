@@ -1283,6 +1283,72 @@ wheels = [
 ]
 
 [[package]]
+name = "lumina-video-studio"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "beautifulsoup4" },
+    { name = "certifi" },
+    { name = "comfykit" },
+    { name = "dashscope" },
+    { name = "edge-tts" },
+    { name = "fastapi" },
+    { name = "fastmcp" },
+    { name = "ffmpeg-python" },
+    { name = "httpx" },
+    { name = "loguru" },
+    { name = "moviepy" },
+    { name = "numpy" },
+    { name = "openai" },
+    { name = "pillow" },
+    { name = "playwright" },
+    { name = "pydantic" },
+    { name = "pyjwt" },
+    { name = "python-multipart" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "streamlit" },
+    { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "beautifulsoup4", specifier = ">=4.14.2" },
+    { name = "certifi", specifier = ">=2025.10.5" },
+    { name = "comfykit", specifier = ">=0.1.12" },
+    { name = "dashscope", specifier = ">=1.23.0" },
+    { name = "edge-tts", specifier = "==7.2.7" },
+    { name = "fastapi", specifier = ">=0.115.0" },
+    { name = "fastmcp", specifier = ">=2.0.0" },
+    { name = "ffmpeg-python", specifier = ">=0.2.0" },
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "loguru", specifier = ">=0.7.0" },
+    { name = "moviepy", specifier = "==1.0.3" },
+    { name = "numpy", specifier = ">=1.26.0" },
+    { name = "openai", specifier = ">=2.6.0" },
+    { name = "pillow", specifier = ">=10.0.0,<12" },
+    { name = "playwright", specifier = ">=1.58.0" },
+    { name = "pydantic", specifier = ">=2.0.0" },
+    { name = "pyjwt", specifier = ">=2.10.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.0" },
+    { name = "python-multipart", specifier = ">=0.0.12" },
+    { name = "pyyaml", specifier = ">=6.0.0" },
+    { name = "requests", specifier = ">=2.32.0" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6.0" },
+    { name = "streamlit", specifier = ">=1.40.0" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.32.0" },
+]
+provides-extras = ["dev"]
+
+[[package]]
 name = "lupa"
 version = "2.6"
 source = { registry = "https://pypi.org/simple" }
@@ -1958,72 +2024,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/cc/2d/e082982aacc927fc2cab48e1e731bdb1643a1406acace8bed0900a61464e/pillow-11.3.0-pp311-pypy311_pp73-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:504b6f59505f08ae014f724b6207ff6222662aab5cc9542577fb084ed0676ac7", size = 5581505, upload-time = "2025-07-01T09:16:25.593Z" },
     { url = "https://files.pythonhosted.org/packages/34/e7/ae39f538fd6844e982063c3a5e4598b8ced43b9633baa3a85ef33af8c05c/pillow-11.3.0-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:c84d689db21a1c397d001aa08241044aa2069e7587b398c8cc63020390b1c1b8", size = 6984598, upload-time = "2025-07-01T09:16:27.732Z" },
 ]
-
-[[package]]
-name = "pixelle-video"
-version = "0.2.0"
-source = { editable = "." }
-dependencies = [
-    { name = "beautifulsoup4" },
-    { name = "certifi" },
-    { name = "comfykit" },
-    { name = "dashscope" },
-    { name = "edge-tts" },
-    { name = "fastapi" },
-    { name = "fastmcp" },
-    { name = "ffmpeg-python" },
-    { name = "httpx" },
-    { name = "loguru" },
-    { name = "moviepy" },
-    { name = "numpy" },
-    { name = "openai" },
-    { name = "pillow" },
-    { name = "playwright" },
-    { name = "pydantic" },
-    { name = "pyjwt" },
-    { name = "python-multipart" },
-    { name = "pyyaml" },
-    { name = "requests" },
-    { name = "streamlit" },
-    { name = "uvicorn", extra = ["standard"] },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "beautifulsoup4", specifier = ">=4.14.2" },
-    { name = "certifi", specifier = ">=2025.10.5" },
-    { name = "comfykit", specifier = ">=0.1.12" },
-    { name = "dashscope", specifier = ">=1.23.0" },
-    { name = "edge-tts", specifier = "==7.2.7" },
-    { name = "fastapi", specifier = ">=0.115.0" },
-    { name = "fastmcp", specifier = ">=2.0.0" },
-    { name = "ffmpeg-python", specifier = ">=0.2.0" },
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "loguru", specifier = ">=0.7.0" },
-    { name = "moviepy", specifier = "==1.0.3" },
-    { name = "numpy", specifier = ">=1.26.0" },
-    { name = "openai", specifier = ">=2.6.0" },
-    { name = "pillow", specifier = ">=10.0.0,<12" },
-    { name = "playwright", specifier = ">=1.58.0" },
-    { name = "pydantic", specifier = ">=2.0.0" },
-    { name = "pyjwt", specifier = ">=2.10.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.0" },
-    { name = "python-multipart", specifier = ">=0.0.12" },
-    { name = "pyyaml", specifier = ">=6.0.0" },
-    { name = "requests", specifier = ">=2.32.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6.0" },
-    { name = "streamlit", specifier = ">=1.40.0" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.32.0" },
-]
-provides-extras = ["dev"]
 
 [[package]]
 name = "platformdirs"

@@ -18,7 +18,7 @@ import streamlit as st
 
 from web.i18n import tr, get_language
 from web.utils.streamlit_helpers import safe_rerun
-from pixelle_video.config import config_manager
+from lumina_video.config import config_manager
 
 
 def render_advanced_settings():
@@ -39,7 +39,7 @@ def render_advanced_settings():
                 st.markdown(f"**{tr('settings.llm.title')}**")
                 
                 # Quick preset selection
-                from pixelle_video.llm_presets import get_preset_names, get_preset, find_preset_by_base_url_and_model
+                from lumina_video.llm_presets import get_preset_names, get_preset, find_preset_by_base_url_and_model
                 
                 # Custom at the end
                 preset_names = get_preset_names() + ["Custom"]
@@ -148,7 +148,7 @@ def render_advanced_settings():
                         f"🔄 {tr('settings.llm.load_models')}",
                         help=tr("settings.llm.load_models_help"),
                         key="load_models_btn",
-                        use_container_width=True
+                        width="stretch"
                     )
                 
                 with test_col:
@@ -157,14 +157,14 @@ def render_advanced_settings():
                         f"🔌 {tr('settings.llm.test_connection')}",
                         help=tr("settings.llm.test_connection_help"),
                         key="test_llm_connection_btn",
-                        use_container_width=True
+                        width="stretch"
                     )
                 
                 # Handle load models button click
                 if load_clicked:
                     if llm_api_key and llm_base_url:
                         try:
-                            from pixelle_video.utils.llm_util import fetch_available_models
+                            from lumina_video.utils.llm_util import fetch_available_models
                             with st.spinner(tr("settings.llm.loading_models")):
                                 models = fetch_available_models(llm_api_key, llm_base_url)
                                 st.session_state.llm_loaded_models = models
@@ -179,7 +179,7 @@ def render_advanced_settings():
                 if test_clicked:
                     if llm_api_key and llm_base_url:
                         try:
-                            from pixelle_video.utils.llm_util import test_llm_connection
+                            from lumina_video.utils.llm_util import test_llm_connection
                             with st.spinner(tr("settings.llm.loading_models")):
                                 success, message, model_count = test_llm_connection(llm_api_key, llm_base_url)
                                 if success:
@@ -232,7 +232,7 @@ def render_advanced_settings():
                     )
                 
                 # Test connection button
-                if st.button(tr("btn.test_connection"), key="test_comfyui", use_container_width=True):
+                if st.button(tr("btn.test_connection"), key="test_comfyui", width="stretch"):
                     try:
                         import requests
                         response = requests.get(f"{comfyui_url}/system_stats", timeout=5)
@@ -434,7 +434,7 @@ def render_advanced_settings():
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button(tr("btn.save_config"), use_container_width=True, key="save_config_btn"):
+            if st.button(tr("btn.save_config"), width="stretch", key="save_config_btn"):
                 try:
                     # Validate and save LLM configuration
                     if not (llm_api_key and llm_base_url and llm_model):
@@ -489,10 +489,10 @@ def render_advanced_settings():
                     st.error(f"{tr('status.save_failed')}: {str(e)}")
         
         with col2:
-            if st.button(tr("btn.reset_config"), use_container_width=True, key="reset_config_btn"):
+            if st.button(tr("btn.reset_config"), width="stretch", key="reset_config_btn"):
                 # Reset to default
-                from pixelle_video.config.schema import PixelleVideoConfig
-                config_manager.config = PixelleVideoConfig()
+                from lumina_video.config.schema import LuminaVideoConfig
+                config_manager.config = LuminaVideoConfig()
                 config_manager.save()
                 st.success(tr("status.config_reset"))
                 safe_rerun()

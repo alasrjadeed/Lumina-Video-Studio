@@ -30,7 +30,7 @@ def _probe_video_duration(video_path: str) -> float:
 
 
 async def save_web_generation_history(
-    pixelle_video: Any,
+    lumina_video: Any,
     *,
     task_id: str,
     video_path: str,
@@ -40,8 +40,8 @@ async def save_web_generation_history(
     n_frames: int = 1,
 ) -> None:
     """Save a minimal history record for workflows implemented directly in Web UI."""
-    if not getattr(pixelle_video, "persistence", None):
-        logger.warning("Pixelle persistence service is not initialized; skipping history save")
+    if not getattr(lumina_video, "persistence", None):
+        logger.warning("Lumina persistence service is not initialized; skipping history save")
         return
 
     path = Path(video_path)
@@ -74,11 +74,11 @@ async def save_web_generation_history(
             "n_frames": n_frames,
         },
         "config": {
-            "llm_model": pixelle_video.config.get("llm", {}).get("model", "unknown"),
-            "llm_base_url": pixelle_video.config.get("llm", {}).get("base_url", "unknown"),
+            "llm_model": lumina_video.config.get("llm", {}).get("model", "unknown"),
+            "llm_base_url": lumina_video.config.get("llm", {}).get("base_url", "unknown"),
             "source": "web",
         },
     }
 
-    await pixelle_video.persistence.save_task_metadata(task_id, metadata)
+    await lumina_video.persistence.save_task_metadata(task_id, metadata)
     logger.info(f"Saved web workflow history: {task_id}")

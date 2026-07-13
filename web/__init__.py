@@ -11,7 +11,7 @@
 # limitations under the License.
 
 """
-Pixelle-Video Web UI Package
+Lumina Video Studio Web UI Package
 
 A modular web interface for generating short videos from content.
 """

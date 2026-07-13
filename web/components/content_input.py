@@ -199,7 +199,7 @@ def render_bgm_section(key_prefix=""):
             st.markdown(tr("bgm.how"))
         
         # Dynamically scan bgm folder for music files (merged from bgm/ and data/bgm/)
-        from pixelle_video.utils.os_util import list_resource_files
+        from lumina_video.utils.os_util import list_resource_files
         
         try:
             all_files = list_resource_files("bgm")
@@ -243,8 +243,8 @@ def render_bgm_section(key_prefix=""):
         
         # BGM preview button (only if BGM is not "None")
         if bgm_choice != tr("bgm.none"):
-            if st.button(tr("bgm.preview"), key=f"{key_prefix}preview_bgm", use_container_width=True):
-                from pixelle_video.utils.os_util import get_resource_path, resource_exists
+            if st.button(tr("bgm.preview"), key=f"{key_prefix}preview_bgm", width="stretch"):
+                from lumina_video.utils.os_util import get_resource_path, resource_exists
                 try:
                     if resource_exists("bgm", bgm_choice):
                         bgm_file_path = get_resource_path("bgm", bgm_choice)
@@ -268,11 +268,11 @@ def render_version_info():
     with st.container(border=True):
         st.markdown(f"**{tr('version.title')}**")
         version = get_project_version()
-        github_url = "https://github.com/AIDC-AI/Pixelle-Video"
+        github_url = "https://github.com/AIDC-AI/Lumina Video Studio"
         
         # Version and GitHub link in one line
-        github_url = "https://github.com/AIDC-AI/Pixelle-Video"
-        badge_url = "https://img.shields.io/github/stars/AIDC-AI/Pixelle-Video"
+        github_url = "https://github.com/AIDC-AI/Lumina Video Studio"
+        badge_url = "https://img.shields.io/github/stars/AIDC-AI/Lumina Video Studio"
 
         st.markdown(
             f'{tr("version.current")}: `{version}` &nbsp;&nbsp; '

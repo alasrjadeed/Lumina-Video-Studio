@@ -22,8 +22,8 @@ from web.components.content_input import render_version_info
 from web.utils.async_helpers import run_async
 from web.utils.history_persistence import save_web_generation_history
 from web.utils.streamlit_helpers import check_and_warn_selfhost_workflow
-from pixelle_video.config import config_manager
-from pixelle_video.utils.os_util import create_task_output_dir
+from lumina_video.config import config_manager
+from lumina_video.utils.os_util import create_task_output_dir
 
 class ActionTransferPipelineUI(PipelineUI):
     """
@@ -41,7 +41,7 @@ class ActionTransferPipelineUI(PipelineUI):
     def description(self):
         return tr("pipeline.action_transfer.description")
 
-    def render(self, pixelle_video: Any):
+    def render(self, lumina_video: Any):
         # Three-column layout
         left_col,middle_col,right_col = st.columns([1, 1, 1])
 
@@ -49,14 +49,14 @@ class ActionTransferPipelineUI(PipelineUI):
         # Left Column: Video Upload
         # ====================================================================
         with left_col:
-            video_params = self.render_action_transfer_video_input(pixelle_video)
+            video_params = self.render_action_transfer_video_input(lumina_video)
             render_version_info()
         
         # ====================================================================
         # Middle Column: Image Upload & Prompt
         # ====================================================================
         with middle_col:
-            assets_params = self.render_action_transfer_assets_input(pixelle_video)
+            assets_params = self.render_action_transfer_assets_input(lumina_video)
 
 
         # ====================================================================
@@ -68,9 +68,9 @@ class ActionTransferPipelineUI(PipelineUI):
                 **assets_params
             }
 
-            self._render_output_preview(pixelle_video, video_params)
+            self._render_output_preview(lumina_video, video_params)
 
-    def render_action_transfer_video_input(self, pixelle_video) -> dict:
+    def render_action_transfer_video_input(self, lumina_video) -> dict:
         with st.container(border=True):
             st.markdown(f"**{tr('action_transfer.video_upload')}**")
 
@@ -131,7 +131,7 @@ class ActionTransferPipelineUI(PipelineUI):
                 "duration": duration
                 }
 
-    def render_action_transfer_assets_input(self, pixelle_video) -> dict:
+    def render_action_transfer_assets_input(self, lumina_video) -> dict:
         with st.container(border=True):
             st.markdown(f"**{tr('action_transfer.image_upload')}**")
 
@@ -175,20 +175,20 @@ class ActionTransferPipelineUI(PipelineUI):
                             # Check if image
                             ext = Path(path).suffix.lower()
                             if ext in [".jpg", ".jpeg", ".png", ".webp"]:
-                                st.image(file, caption=file.name, use_container_width=True)
+                                st.image(file, caption=file.name, width="stretch")
             else:
                 st.info(tr("action_transfer.assets.image_empty_hint"))
             
             def list_action_transfer_workflows():
                 if workflow_source == "api":
                     return list_api_media_workflows(
-                        pixelle_video,
+                        lumina_video,
                         "video",
                         required_adapter_abilities=["action_transfer"],
                         verified_only=True,
                     )
                 return list_local_media_workflows(
-                    pixelle_video,
+                    lumina_video,
                     "video",
                     workflow_source,
                     key_prefix="af_",
@@ -203,12 +203,12 @@ class ActionTransferPipelineUI(PipelineUI):
                         )
 
             source_options = []
-            if list_local_media_workflows(pixelle_video, "video", "runninghub", key_prefix="af_"):
+            if list_local_media_workflows(lumina_video, "video", "runninghub", key_prefix="af_"):
                 source_options.append("runninghub")
-            if list_local_media_workflows(pixelle_video, "video", "selfhost", key_prefix="af_"):
+            if list_local_media_workflows(lumina_video, "video", "selfhost", key_prefix="af_"):
                 source_options.append("selfhost")
             if list_api_media_workflows(
-                pixelle_video,
+                lumina_video,
                 "video",
                 required_adapter_abilities=["action_transfer"],
                 verified_only=True,
@@ -287,7 +287,7 @@ class ActionTransferPipelineUI(PipelineUI):
                 "api_video_params": api_video_params,
                 }
 
-    def _render_output_preview(self, pixelle_video: Any, video_params: dict):
+    def _render_output_preview(self, lumina_video: Any, video_params: dict):
         """Render output preview section"""
         with st.container(border=True):
             st.markdown(f"**{tr('section.video_generation')}**")
@@ -310,7 +310,7 @@ class ActionTransferPipelineUI(PipelineUI):
                 st.button(
                     tr("btn.generate"),
                     type="primary",
-                    use_container_width=True,
+                    width="stretch",
                     disabled=True,
                     key="action_transfer_generate_video_disabled"
                 )
@@ -321,7 +321,7 @@ class ActionTransferPipelineUI(PipelineUI):
                 st.button(
                     tr("btn.generate"),
                     type="primary",
-                    use_container_width=True,
+                    width="stretch",
                     disabled=True,
                     key="action_transfer_generate_image_disabled"
                 )
@@ -332,14 +332,14 @@ class ActionTransferPipelineUI(PipelineUI):
                 st.button(
                     tr("btn.generate"),
                     type="primary",
-                    use_container_width=True,
+                    width="stretch",
                     disabled=True,
                     key="action_transfer_generate"
                 )
                 return
 
             # Generate button
-            if st.button(tr("btn.generate"), type="primary", use_container_width=True, key="transfer_generate"):
+            if st.button(tr("btn.generate"), type="primary", width="stretch", key="transfer_generate"):
                 if not config_manager.validate():
                     st.error(tr("settings.not_configured"))
                     st.stop()
@@ -376,13 +376,13 @@ class ActionTransferPipelineUI(PipelineUI):
                                 "first_clip_path": video_path,
                                 "reference_image_path": image_path,
                             }
-                            media_result = await pixelle_video.media(
+                            media_result = await lumina_video.media(
                                 **media_params,
                             )
                             progress_bar.progress(100)
                             status_text.text(tr("status.success"))
                             await save_web_generation_history(
-                                pixelle_video,
+                                lumina_video,
                                 task_id=task_id,
                                 video_path=media_result.url,
                                 pipeline="action_transfer",
@@ -399,7 +399,7 @@ class ActionTransferPipelineUI(PipelineUI):
                             )
                             return media_result.url
 
-                        kit = await pixelle_video._get_or_create_comfykit()
+                        kit = await lumina_video._get_or_create_comfykit()
 
                         workflow_path = Path("workflows") / workflow_key
 
@@ -446,7 +446,7 @@ class ActionTransferPipelineUI(PipelineUI):
                         progress_bar.progress(100)
                         status_text.text(tr("status.success"))
                         await save_web_generation_history(
-                            pixelle_video,
+                            lumina_video,
                             task_id=task_id,
                             video_path=final_video_path,
                             pipeline="action_transfer",
@@ -497,7 +497,7 @@ class ActionTransferPipelineUI(PipelineUI):
                                 data=video_bytes,
                                 file_name=video_filename,
                                 mime="video/mp4",
-                                use_container_width=True
+                                width="stretch"
                             )
                     else:
                         st.error(tr("status.video_not_found", path=final_video_path))

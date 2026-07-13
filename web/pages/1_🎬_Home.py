@@ -26,7 +26,7 @@ if str(_project_root) not in sys.path:
 import streamlit as st
 
 # Import state management
-from web.state.session import init_session_state, init_i18n, get_pixelle_video
+from web.state.session import init_session_state, init_i18n, get_lumina_video
 
 # Import components
 from web.components.header import render_header
@@ -35,7 +35,7 @@ from web.components.faq import render_faq_sidebar
 
 # Page config
 st.set_page_config(
-    page_title="Home - Pixelle-Video",
+    page_title="Home - Lumina Video Studio",
     page_icon="🎬",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -54,8 +54,8 @@ def main():
     # Render FAQ in sidebar
     render_faq_sidebar()
     
-    # Initialize Pixelle-Video
-    pixelle_video = get_pixelle_video()
+    # Initialize Lumina Video Studio
+    lumina_video = get_lumina_video()
     
     # Render system configuration (LLM + ComfyUI)
     render_advanced_settings()
@@ -81,7 +81,7 @@ def main():
                 st.caption(pipeline.description)
             
             # Delegate rendering
-            pipeline.render(pixelle_video)
+            pipeline.render(lumina_video)
 
 
 if __name__ == "__main__":

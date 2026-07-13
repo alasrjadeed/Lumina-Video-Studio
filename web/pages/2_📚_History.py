@@ -28,14 +28,14 @@ if str(_project_root) not in sys.path:
 import streamlit as st
 from loguru import logger
 
-from web.state.session import init_session_state, init_i18n, get_pixelle_video
+from web.state.session import init_session_state, init_i18n, get_lumina_video
 from web.components.header import render_header
 from web.i18n import tr
 from web.utils.async_helpers import run_async
 
 # Page config
 st.set_page_config(
-    page_title="History - Pixelle-Video",
+    page_title="History - Lumina Video Studio",
     page_icon="📚",
     layout="wide",
 )
@@ -83,12 +83,12 @@ def truncate_text(text: str, max_length: int = 60) -> str:
     return text[:max_length] + "..."
 
 
-def render_sidebar_controls(pixelle_video):
+def render_sidebar_controls(lumina_video):
     """Render sidebar with statistics and filters"""
     with st.sidebar:
         # Statistics
         st.markdown(f"**📊 {tr('history.total_tasks')}**")
-        stats = run_async(pixelle_video.history.get_statistics())
+        stats = run_async(lumina_video.history.get_statistics())
         
         col1, col2 = st.columns(2)
         with col1:
@@ -161,7 +161,7 @@ def render_sidebar_controls(pixelle_video):
         return filter_status, sort_by, sort_order, page_size
 
 
-def render_grid_task_card(task: dict, pixelle_video):
+def render_grid_task_card(task: dict, lumina_video):
     """Render a compact grid task card"""
     task_id = task["task_id"]
     title = task.get("title", "Untitled")
@@ -181,7 +181,7 @@ def render_grid_task_card(task: dict, pixelle_video):
     status_icon = status_map.get(status, "❓")
     
     # Get input text
-    detail = run_async(pixelle_video.history.get_task_detail(task_id))
+    detail = run_async(lumina_video.history.get_task_detail(task_id))
     input_text = ""
     if detail and detail.get("metadata"):
         input_params = detail["metadata"].get("input", {})
@@ -213,7 +213,7 @@ def render_grid_task_card(task: dict, pixelle_video):
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            if st.button("👁️", key=f"view_{task_id}", help=tr("history.task_card.view_detail"), use_container_width=True):
+            if st.button("👁️", key=f"view_{task_id}", help=tr("history.task_card.view_detail"), width="stretch"):
                 st.session_state[f"detail_{task_id}"] = True
                 st.rerun()
         
@@ -227,13 +227,13 @@ def render_grid_task_card(task: dict, pixelle_video):
                         mime="video/mp4",
                         key=f"download_{task_id}",
                         help=tr("history.task_card.download"),
-                        use_container_width=True
+                        width="stretch"
                     )
             else:
-                st.button("⬇️", key=f"download_disabled_{task_id}", disabled=True, use_container_width=True)
+                st.button("⬇️", key=f"download_disabled_{task_id}", disabled=True, width="stretch")
         
         with col3:
-            if st.button("🗑️", key=f"delete_{task_id}", help=tr("history.task_card.delete"), use_container_width=True):
+            if st.button("🗑️", key=f"delete_{task_id}", help=tr("history.task_card.delete"), width="stretch"):
                 st.session_state[f"confirm_delete_{task_id}"] = True
                 st.rerun()
         
@@ -242,9 +242,9 @@ def render_grid_task_card(task: dict, pixelle_video):
             st.warning("⚠️ 确认删除?")
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("✅", key=f"confirm_yes_{task_id}", use_container_width=True):
+                if st.button("✅", key=f"confirm_yes_{task_id}", width="stretch"):
                     try:
-                        success = run_async(pixelle_video.history.delete_task(task_id))
+                        success = run_async(lumina_video.history.delete_task(task_id))
                         if success:
                             st.success(tr("history.action.delete_success"))
                             st.session_state[f"confirm_delete_{task_id}"] = False
@@ -254,14 +254,14 @@ def render_grid_task_card(task: dict, pixelle_video):
                     except Exception as e:
                         st.error(f"删除失败: {str(e)}")
             with col2:
-                if st.button("❌", key=f"confirm_no_{task_id}", use_container_width=True):
+                if st.button("❌", key=f"confirm_no_{task_id}", width="stretch"):
                     st.session_state[f"confirm_delete_{task_id}"] = False
                     st.rerun()
 
 
-def render_task_detail_modal(task_id: str, pixelle_video):
+def render_task_detail_modal(task_id: str, lumina_video):
     """Render task detail in three-column layout"""
-    detail = run_async(pixelle_video.history.get_task_detail(task_id))
+    detail = run_async(lumina_video.history.get_task_detail(task_id))
     
     if not detail:
         st.error("Task not found")
@@ -359,7 +359,7 @@ def render_task_detail_modal(task_id: str, pixelle_video):
                     data=f,
                     file_name=f"{title}.mp4",
                     mime="video/mp4",
-                    use_container_width=True
+                    width="stretch"
                 )
         else:
             st.warning("Video file not found")
@@ -381,11 +381,11 @@ def main():
     # Render header
     render_header()
     
-    # Initialize Pixelle-Video
-    pixelle_video = get_pixelle_video()
+    # Initialize Lumina Video Studio
+    lumina_video = get_lumina_video()
     
     # Sidebar: Statistics + Filters
-    filter_status, sort_by, sort_order, page_size = render_sidebar_controls(pixelle_video)
+    filter_status, sort_by, sort_order, page_size = render_sidebar_controls(lumina_video)
     
     # Initialize pagination in session state
     if "history_page" not in st.session_state:
@@ -400,12 +400,12 @@ def main():
     
     # If showing detail, render it
     if show_detail_for:
-        render_task_detail_modal(show_detail_for, pixelle_video)
+        render_task_detail_modal(show_detail_for, lumina_video)
         return
     
     # Otherwise, show the grid list
     # Get task list
-    result = run_async(pixelle_video.history.get_task_list(
+    result = run_async(lumina_video.history.get_task_list(
         page=st.session_state.history_page,
         page_size=page_size,
         status=filter_status,
@@ -436,7 +436,7 @@ def main():
                 task_idx = i + j
                 if task_idx < len(tasks):
                     with cols[j]:
-                        render_grid_task_card(tasks[task_idx], pixelle_video)
+                        render_grid_task_card(tasks[task_idx], lumina_video)
     
     # Pagination
     if total_pages > 1:
@@ -444,7 +444,7 @@ def main():
         col1, col2, col3 = st.columns([1, 2, 1])
         
         with col1:
-            if st.button("⬅️ Previous", disabled=st.session_state.history_page == 1, use_container_width=True):
+            if st.button("⬅️ Previous", disabled=st.session_state.history_page == 1, width="stretch"):
                 st.session_state.history_page -= 1
                 st.rerun()
         
@@ -457,7 +457,7 @@ def main():
             )
         
         with col3:
-            if st.button("Next ➡️", disabled=st.session_state.history_page == total_pages, use_container_width=True):
+            if st.button("Next ➡️", disabled=st.session_state.history_page == total_pages, width="stretch"):
                 st.session_state.history_page += 1
                 st.rerun()
 

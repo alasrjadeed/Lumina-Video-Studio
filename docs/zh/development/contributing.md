@@ -1,6 +1,6 @@
 # 贡献指南
 
-感谢你对 Pixelle-Video 的贡献兴趣！
+感谢你对 Lumina Video Studio 的贡献兴趣！
 
 ---
 
@@ -18,8 +18,8 @@
 
 ```bash
 # 克隆你的 fork
-git clone https://github.com/your-username/Pixelle-Video.git
-cd Pixelle-Video
+git clone https://github.com/your-username/Lumina Video Studio.git
+cd Lumina Video Studio
 
 # 安装开发依赖
 uv sync
@@ -40,7 +40,7 @@ pytest
 
 ## 提交 Issue
 
-遇到问题或有功能建议？请在 [GitHub Issues](https://github.com/AIDC-AI/Pixelle-Video/issues) 提交。
+遇到问题或有功能建议？请在 [GitHub Issues](https://github.com/LuminaAI/Lumina-Video-Studio/issues) 提交。
 
 ---
 

@@ -1,12 +1,12 @@
 # Architecture
 
-Technical architecture overview of Pixelle-Video.
+Technical architecture overview of Lumina Video Studio.
 
 ---
 
 ## Core Architecture
 
-Pixelle-Video uses a layered architecture design:
+Lumina Video Studio uses a layered architecture design:
 
 - **Web Layer**: Streamlit Web interface
 - **Service Layer**: Core business logic
@@ -16,7 +16,7 @@ Pixelle-Video uses a layered architecture design:
 
 ## Main Components
 
-### PixelleVideoCore
+### LuminaVideoCore
 
 Core service class coordinating all sub-services.
 

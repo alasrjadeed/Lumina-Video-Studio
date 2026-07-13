@@ -3,14 +3,14 @@ chcp 65001 >nul
 setlocal enabledelayedexpansion
 
 echo ========================================
-echo   Pixelle-Video - Windows Launcher
+echo   Lumina Video Studio - Windows Launcher
 echo ========================================
 echo.
 
 :: Set environment variables
 set "PYTHON_HOME=%~dp0python\python311"
 set "PATH=%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%~dp0tools\ffmpeg\bin;%PATH%"
-set "PROJECT_ROOT=%~dp0Pixelle-Video"
+set "PROJECT_ROOT=%~dp0Lumina-Video-Studio"
 
 :: Change to project directory
 cd /d "%PROJECT_ROOT%"
@@ -22,7 +22,7 @@ set "PYTHONPATH=%PROJECT_ROOT%"
 set "PIXELLE_VIDEO_ROOT=%PROJECT_ROOT%"
 
 :: Start Web UI
-echo [Starting] Launching Pixelle-Video Web UI...
+echo [Starting] Launching Lumina Video Studio Web UI...
 echo Browser will open automatically.
 echo.
 echo Note: Configure API keys and settings in the Web UI.

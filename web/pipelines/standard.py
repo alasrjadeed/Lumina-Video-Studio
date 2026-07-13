@@ -44,7 +44,7 @@ class StandardPipelineUI(PipelineUI):
     def description(self):
         return tr("pipeline.quick_create.description")
     
-    def render(self, pixelle_video: Any):
+    def render(self, lumina_video: Any):
         # Three-column layout
         left_col, middle_col, right_col = st.columns([1, 1, 1])
         
@@ -66,7 +66,7 @@ class StandardPipelineUI(PipelineUI):
         # ====================================================================
         with middle_col:
             # Style configuration (TTS, template, workflow, etc.)
-            style_params = render_style_config(pixelle_video)
+            style_params = render_style_config(lumina_video)
         
         # ====================================================================
         # Right Column: Output Preview
@@ -81,7 +81,7 @@ class StandardPipelineUI(PipelineUI):
             }
             
             # Render output preview (generate button, progress, video preview)
-            render_output_preview(pixelle_video, video_params)
+            render_output_preview(lumina_video, video_params)
 
 
 # Register self

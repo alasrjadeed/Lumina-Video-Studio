@@ -56,7 +56,7 @@ def workflow_select_help() -> str:
 
 
 def list_local_media_workflows(
-    pixelle_video: Any,
+    lumina_video: Any,
     media_type: str,
     source: str,
     key_contains: str | None = None,
@@ -66,7 +66,7 @@ def list_local_media_workflows(
     try:
         workflows = []
         seen_keys = set()
-        for workflow in pixelle_video.media.list_workflows():
+        for workflow in lumina_video.media.list_workflows():
             key = workflow.get("key") or workflow.get("path") or ""
             if not key or key.startswith("api/"):
                 continue
@@ -97,7 +97,7 @@ def list_local_media_workflows(
 
         if key_prefix:
             try:
-                from pixelle_video.utils.os_util import get_resource_path, list_resource_files
+                from lumina_video.utils.os_util import get_resource_path, list_resource_files
 
                 for filename in list_resource_files("workflows", source):
                     if not filename.startswith(key_prefix) or not filename.endswith(".json"):
@@ -123,13 +123,13 @@ def list_local_media_workflows(
 
 
 def list_api_media_workflows(
-    pixelle_video: Any,
+    lumina_video: Any,
     media_type: str,
     required_adapter_abilities: list[str] | tuple[str, ...] | set[str] | None = None,
     verified_only: bool = False,
 ) -> list[dict]:
     """List API-backed media workflows in the same option shape used by UIs."""
-    api_media = getattr(pixelle_video, "api_media", None)
+    api_media = getattr(lumina_video, "api_media", None)
     if api_media is None:
         return []
 

@@ -35,7 +35,7 @@ def run_async(coro):
             return loop.run_until_complete(coro)
         finally:
             try:
-                from pixelle_video.services.frame_html import HTMLFrameGenerator
+                from lumina_video.services.frame_html import HTMLFrameGenerator
 
                 loop.run_until_complete(HTMLFrameGenerator.close_browser())
             except Exception as e:

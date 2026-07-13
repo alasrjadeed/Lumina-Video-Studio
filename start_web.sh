@@ -1,7 +1,7 @@
 #!/bin/bash
-# Start Pixelle-Video Web UI
+# Start Lumina Video Studio Web UI
 
-echo "🚀 Starting Pixelle-Video Web UI..."
+echo "🚀 Starting Lumina Video Studio Web UI..."
 echo ""
 
 # Start Streamlit

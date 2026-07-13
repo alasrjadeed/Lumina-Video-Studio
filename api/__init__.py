@@ -1,4 +1,4 @@
-# Copyright (C) 2025 AIDC-AI
+# Copyright (C) 2025 Lumina AI
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
 # limitations under the License.
 
 """
-Pixelle-Video API Layer
+Lumina Video Studio API Layer
 
 FastAPI-based REST API for video generation services.
 """

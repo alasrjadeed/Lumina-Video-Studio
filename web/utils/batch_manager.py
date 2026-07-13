@@ -37,7 +37,7 @@ class SimpleBatchManager:
     
     def execute_batch(
         self,
-        pixelle_video,
+        lumina_video,
         topics: List[str],
         shared_config: Dict[str, Any],
         overall_progress_callback: Optional[Callable] = None,
@@ -47,7 +47,7 @@ class SimpleBatchManager:
         Execute batch generation with shared config
         
         Args:
-            pixelle_video: PixelleVideoCore instance
+            lumina_video: LuminaVideoCore instance
             topics: List of topics (one per video)
             shared_config: Shared configuration for all videos
             overall_progress_callback: Callback for overall progress
@@ -110,7 +110,7 @@ class SimpleBatchManager:
                 
                 # Execute generation
                 from web.utils.async_helpers import run_async
-                result = run_async(pixelle_video.generate_video(**task_params))
+                result = run_async(lumina_video.generate_video(**task_params))
                 
                 # Extract task_id from video_path (e.g., output/20251118_173821_f96a/final.mp4)
                 from pathlib import Path
