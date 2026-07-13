@@ -1,4 +1,4 @@
-# Copyright (C) 2025 AIDC-AI
+# Copyright (C) 2025 Lumina AI
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@ International language support for Lumina Video Studio Web UI
 """
 
 import json
-import locale
 from pathlib import Path
 from typing import Dict, Optional
 
 from loguru import logger
 
 _locales: Dict[str, dict] = {}
-_current_language: str = "en_US"  # Default fallback to English
+_current_language: str = "en_US"
 
 
 def load_locales() -> Dict[str, dict]:
@@ -65,7 +64,7 @@ def get_language() -> str:
 
 def tr(key: str, fallback: Optional[str] = None, **kwargs) -> str:
     """
-    Translate a key to current language
+    Translate a key to current language (English only)
     
     Args:
         key: Translation key (e.g., "app.title")
@@ -74,10 +73,6 @@ def tr(key: str, fallback: Optional[str] = None, **kwargs) -> str:
     
     Returns:
         Translated text
-    
-    Example:
-        tr("app.title")  # => "Lumina Video Studio"
-        tr("error.missing_field", field="API Key")  # => "请填写 API Key"
     """
     locale = _locales.get(_current_language, {})
     translations = locale.get("t", {})
@@ -85,20 +80,15 @@ def tr(key: str, fallback: Optional[str] = None, **kwargs) -> str:
     result = translations.get(key)
     
     if result is None:
-        # Try fallback parameter
         if fallback is not None:
             result = fallback
-        # Try English fallback
-        elif _current_language != "en_US" and "en_US" in _locales:
-            en_locale = _locales["en_US"]
-            result = en_locale.get("t", {}).get(key)
+        elif "en_US" in _locales:
+            result = _locales["en_US"].get("t", {}).get(key)
         
-        # Last resort: return the key itself
         if result is None:
             result = key
             logger.debug(f"Translation missing: {key}")
     
-    # Apply string interpolation if kwargs provided
     if kwargs:
         try:
             result = result.format(**kwargs)
@@ -112,7 +102,6 @@ def get_language_name(lang_code: Optional[str] = None) -> str:
     """Get display name of a language"""
     if lang_code is None:
         lang_code = _current_language
-    
     locale = _locales.get(lang_code, {})
     return locale.get("language_name", lang_code)
 
@@ -125,125 +114,7 @@ def get_available_languages() -> Dict[str, str]:
     }
 
 
-def detect_system_language() -> str:
-    """
-    Detect system/OS language and return the best matching locale code.
-    Falls back to English if no match found.
-    
-    This is designed for self-hosted scenarios where the server and browser
-    are typically on the same machine.
-    
-    Returns:
-        Language code (e.g., "zh_CN", "en_US")
-    """
-    try:
-        import os
-        import platform
-        import subprocess
-        
-        system_locale = None
-        
-        # Method 1: macOS-specific detection (most reliable for macOS)
-        if platform.system() == "Darwin":  # macOS
-            try:
-                # Get AppleLocale which reflects system language preference
-                result = subprocess.run(
-                    ["defaults", "read", "-g", "AppleLocale"],
-                    capture_output=True,
-                    text=True,
-                    timeout=2
-                )
-                if result.returncode == 0:
-                    system_locale = result.stdout.strip()
-                    logger.debug(f"System locale from macOS AppleLocale: {system_locale}")
-            except Exception as e:
-                logger.debug(f"macOS AppleLocale detection failed: {e}")
-            
-            # Fallback: try AppleLanguages
-            if not system_locale:
-                try:
-                    result = subprocess.run(
-                        ["defaults", "read", "-g", "AppleLanguages"],
-                        capture_output=True,
-                        text=True,
-                        timeout=2
-                    )
-                    if result.returncode == 0:
-                        # Parse array output like: ( "zh-Hans-CN", "en-CN" )
-                        output = result.stdout.strip()
-                        # Extract first language
-                        import re
-                        match = re.search(r'"([^"]+)"', output)
-                        if match:
-                            lang = match.group(1)
-                            # Convert zh-Hans-CN to zh_CN
-                            if lang.startswith("zh-Hans"):
-                                system_locale = "zh_CN"
-                            elif lang.startswith("zh-Hant"):
-                                system_locale = "zh_TW"
-                            else:
-                                system_locale = lang.replace("-", "_")
-                            logger.debug(f"System locale from macOS AppleLanguages: {system_locale}")
-                except Exception as e:
-                    logger.debug(f"macOS AppleLanguages detection failed: {e}")
-        
-        # Method 2: Get from environment locale (cross-platform)
-        if not system_locale:
-            try:
-                system_locale = locale.getdefaultlocale()[0]
-                logger.debug(f"System locale from getdefaultlocale(): {system_locale}")
-            except Exception as e:
-                logger.debug(f"getdefaultlocale() failed: {e}")
-        
-        # Method 3: Get from current locale
-        if not system_locale:
-            try:
-                system_locale = locale.getlocale()[0]
-                logger.debug(f"System locale from getlocale(): {system_locale}")
-            except Exception as e:
-                logger.debug(f"getlocale() failed: {e}")
-        
-        # Method 4: Try to get from environment variables
-        if not system_locale:
-            for env_var in ['LC_ALL', 'LC_MESSAGES', 'LANG', 'LANGUAGE']:
-                env_value = os.environ.get(env_var)
-                if env_value:
-                    # Extract language code from formats like "zh_CN.UTF-8"
-                    system_locale = env_value.split('.')[0]
-                    logger.debug(f"System locale from {env_var}: {system_locale}")
-                    break
-        
-        if system_locale:
-            # Normalize the locale string
-            # Handle formats: zh_CN, zh-CN, zh_CN.UTF-8, etc.
-            system_locale = system_locale.replace('-', '_').split('.')[0]
-            
-            # Direct match (e.g., "zh_CN")
-            for locale_code in _locales.keys():
-                if locale_code.lower() == system_locale.lower():
-                    logger.info(f"System language matched: {locale_code}")
-                    return locale_code
-            
-            # Partial match (e.g., "zh" matches "zh_CN")
-            lang_prefix = system_locale.split('_')[0].lower()
-            for locale_code in _locales.keys():
-                if locale_code.lower().startswith(lang_prefix):
-                    logger.info(f"System language partially matched: {locale_code} (from {system_locale})")
-                    return locale_code
-        
-        logger.info("No system language detected, using fallback")
-    except Exception as e:
-        logger.warning(f"Failed to detect system language: {e}")
-    
-    # Fallback to English
-    return "en_US"
-
-
 # Auto-load locales on import
 load_locales()
-
-# Auto-detect and set system language
-_detected_language = detect_system_language()
-_current_language = _detected_language
-logger.info(f"Default language initialized to: {_current_language}")
-
+_current_language = "en_US"
+logger.info(f"Language initialized to: {_current_language}")

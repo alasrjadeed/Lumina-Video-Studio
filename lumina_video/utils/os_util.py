@@ -14,7 +14,6 @@
 OS utilities for file and path management
 
 Provides utilities for managing paths and files in Lumina Video Studio.
-Inspired by Pixelle-MCP's os_util.py.
 """
 
 import os
@@ -28,14 +27,14 @@ def get_lumina_video_root_path() -> str:
     """
     Get Lumina Video Studio root path
     
-    Uses PIXELLE_VIDEO_ROOT environment variable to determine project root.
+    Uses LUMINA_VIDEO_ROOT environment variable to determine project root.
     This ensures reliable path resolution in both development and packaged environments.
     
     Returns:
         Project root path as string
     """
     # Check environment variable (required for reliable operation)
-    env_root = os.environ.get("PIXELLE_VIDEO_ROOT")
+    env_root = os.environ.get("LUMINA_VIDEO_ROOT")
     if env_root and Path(env_root).exists():
         return str(Path(env_root).resolve())
     

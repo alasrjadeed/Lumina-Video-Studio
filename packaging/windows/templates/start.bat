@@ -18,8 +18,8 @@ cd /d "%PROJECT_ROOT%"
 :: Set PYTHONPATH to project root for module imports
 set "PYTHONPATH=%PROJECT_ROOT%"
 
-:: Set PIXELLE_VIDEO_ROOT environment variable for reliable path resolution
-set "PIXELLE_VIDEO_ROOT=%PROJECT_ROOT%"
+:: Set LUMINA_VIDEO_ROOT environment variable for reliable path resolution
+set "LUMINA_VIDEO_ROOT=%PROJECT_ROOT%"
 
 :: Start Web UI
 echo [Starting] Launching Lumina Video Studio Web UI...

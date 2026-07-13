@@ -1,0 +1,2 @@
+cd "/home/oem/Documents/Lumina Video Studio"
+.venv/bin/streamlit run web/app.py --server.port 8501 --server.headless true --server.address 0.0.0.0
