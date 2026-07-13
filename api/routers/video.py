@@ -221,6 +221,16 @@ async def generate_video_async(
             media_width, media_height = generator.get_media_size()
             logger.debug(f"Auto-determined media size from template: {media_width}x{media_height}")
             
+            # Progress callback to update task manager
+            def progress_callback(event):
+                if hasattr(event, 'progress'):
+                    task_manager.update_progress(
+                        task_id=task.task_id,
+                        current=int(event.progress * 100),
+                        total=100,
+                        message=getattr(event, 'action', '') or getattr(event, 'step', '')
+                    )
+            
             # Build video generation parameters
             video_params = {
                 "text": request_body.text,
@@ -239,8 +249,7 @@ async def generate_video_async(
                 "prompt_prefix": request_body.prompt_prefix,
                 "bgm_path": request_body.bgm_path,
                 "bgm_volume": request_body.bgm_volume,
-                # Progress callback can be added here if needed
-                # "progress_callback": lambda event: task_manager.update_progress(...)
+                "progress_callback": progress_callback,
             }
             
             # Add TTS workflow if specified

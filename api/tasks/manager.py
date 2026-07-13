@@ -33,13 +33,14 @@ class TaskManager:
     Features:
     - In-memory storage (can be replaced with Redis later)
     - Task lifecycle management
-    - Progress tracking
+    - Progress tracking with WebSocket notifications
     - Auto cleanup of old tasks
     """
     
     def __init__(self):
         self._tasks: Dict[str, Task] = {}
         self._task_futures: Dict[str, asyncio.Task] = {}
+        self._subscribers: Dict[str, List[asyncio.Queue]] = {}
         self._cleanup_task: Optional[asyncio.Task] = None
         self._running = False
     
@@ -186,7 +187,7 @@ class TaskManager:
         message: str = ""
     ):
         """
-        Update task progress
+        Update task progress and notify WebSocket subscribers
         
         Args:
             task_id: Task ID
@@ -205,6 +206,55 @@ class TaskManager:
             percentage=percentage,
             message=message
         )
+        
+        # Notify subscribers
+        self._notify_subscribers(task_id, task)
+    
+    def subscribe(self, task_id: str) -> asyncio.Queue:
+        """
+        Subscribe to task progress updates
+        
+        Args:
+            task_id: Task ID to subscribe to
+            
+        Returns:
+            asyncio.Queue that receives task updates
+        """
+        queue: asyncio.Queue = asyncio.Queue()
+        if task_id not in self._subscribers:
+            self._subscribers[task_id] = []
+        self._subscribers[task_id].append(queue)
+        return queue
+    
+    def unsubscribe(self, task_id: str, queue: asyncio.Queue):
+        """
+        Unsubscribe from task progress updates
+        
+        Args:
+            task_id: Task ID
+            queue: Queue to remove
+        """
+        if task_id in self._subscribers:
+            self._subscribers[task_id] = [
+                q for q in self._subscribers[task_id] if q is not queue
+            ]
+            if not self._subscribers[task_id]:
+                del self._subscribers[task_id]
+    
+    def _notify_subscribers(self, task_id: str, task: Task):
+        """
+        Notify all subscribers of a task update
+        
+        Args:
+            task_id: Task ID
+            task: Updated task object
+        """
+        subscribers = self._subscribers.get(task_id, [])
+        for queue in subscribers:
+            try:
+                queue.put_nowait(task)
+            except asyncio.QueueFull:
+                pass  # Skip if queue is full (subscriber too slow)
     
     def cancel_task(self, task_id: str) -> bool:
         """

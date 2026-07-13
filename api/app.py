@@ -56,6 +56,9 @@ from api.routers import (
     frame_router,
 )
 
+# Import WebSocket router
+from api.routers.websocket import router as websocket_router
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -134,6 +137,9 @@ app.include_router(files_router, prefix=api_config.api_prefix)
 app.include_router(resources_router, prefix=api_config.api_prefix)
 app.include_router(frame_router, prefix=api_config.api_prefix)
 
+# WebSocket router (no prefix, path includes /ws)
+app.include_router(websocket_router)
+
 
 @app.get("/")
 async def root():
@@ -143,6 +149,7 @@ async def root():
         "version": "0.1.0",
         "docs": api_config.docs_url,
         "health": "/health",
+        "websocket": "ws://{host}:{port}/ws/tasks/{task_id}",
         "api": {
             "llm": f"{api_config.api_prefix}/llm",
             "tts": f"{api_config.api_prefix}/tts",
