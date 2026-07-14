@@ -54,35 +54,38 @@ def path_to_url(request: Request, file_path: str) -> str:
         
         Domain:  With domain request -> https://your-domain.com/api/files/...
     """
-    from pathlib import Path
-    import os
-    
-    # Normalize path separators to forward slashes first (for cross-platform compatibility)
-    file_path = file_path.replace("\\", "/")
-    
-    # Check if it's an absolute path (works for both Windows and Linux)
-    is_absolute = os.path.isabs(file_path) or Path(file_path).is_absolute()
-    
-    if is_absolute:
-        # Find "output" in the path and get everything after it
-        # Split by / to work with normalized paths
-        parts = file_path.split("/")
-        try:
-            output_idx = parts.index("output")
-            # Get all parts after "output" and join them
-            relative_parts = parts[output_idx + 1:]
-            file_path = "/".join(relative_parts)
-        except ValueError:
-            # If "output" not in path, use the filename only
-            file_path = Path(file_path).name
-    else:
-        # If relative path starting with "output/", remove it
-        if file_path.startswith("output/"):
-            file_path = file_path[7:]  # Remove "output/"
-    
-    # Build URL using request's base_url (automatically matches the request host)
-    base_url = str(request.base_url).rstrip('/')
-    return f"{base_url}/api/files/{file_path}"
+    try:
+        from pathlib import Path
+        import os
+        
+        # Normalize path separators to forward slashes first (for cross-platform compatibility)
+        file_path = file_path.replace("\\", "/")
+        
+        # Check if it's an absolute path (works for both Windows and Linux)
+        is_absolute = os.path.isabs(file_path) or Path(file_path).is_absolute()
+        
+        if is_absolute:
+            # Find "output" in the path and get everything after it
+            # Split by / to work with normalized paths
+            parts = file_path.split("/")
+            try:
+                output_idx = parts.index("output")
+                # Get all parts after "output" and join them
+                relative_parts = parts[output_idx + 1:]
+                file_path = "/".join(relative_parts)
+            except ValueError:
+                # If "output" not in path, use the filename only
+                file_path = Path(file_path).name
+        else:
+            # If relative path starting with "output/", remove it
+            if file_path.startswith("output/"):
+                file_path = file_path[7:]  # Remove "output/"
+        
+        # Build URL using request's base_url (automatically matches the request host)
+        base_url = str(request.base_url).rstrip('/')
+        return f"{base_url}/api/files/{file_path}"
+    except Exception:
+        return file_path
 
 
 @router.post("/generate/sync", response_model=VideoGenerateResponse)
@@ -109,7 +112,7 @@ async def generate_video_sync(
         
         # Auto-determine media_width and media_height from template meta tags (required)
         if not request_body.frame_template:
-            raise ValueError("frame_template is required to determine media size")
+            raise HTTPException(status_code=400, detail="frame_template is required to determine media size")
         
         from lumina_video.services.frame_html import HTMLFrameGenerator
         from lumina_video.utils.template_util import resolve_template_path
@@ -158,8 +161,11 @@ async def generate_video_sync(
         # Call video generator service
         result = await lumina_video.generate_video(**video_params)
         
+        if result is None:
+            raise HTTPException(status_code=500, detail="Video generation returned no result")
+        
         # Get file size
-        file_size = os.path.getsize(result.video_path) if os.path.exists(result.video_path) else 0
+        file_size = os.path.getsize(result.video_path) if result.video_path and os.path.exists(result.video_path) else 0
         
         # Convert path to URL
         video_url = path_to_url(request, result.video_path)
@@ -222,13 +228,44 @@ async def generate_video_async(
             logger.debug(f"Auto-determined media size from template: {media_width}x{media_height}")
             
             # Progress callback to update task manager
+            _STEP_LABELS = {
+                "audio": "Generating audio",
+                "image": "Generating image",
+                "compose": "Composing frame",
+                "video": "Creating video segment",
+            }
+            
             def progress_callback(event):
                 if hasattr(event, 'progress'):
+                    event_type = getattr(event, 'event_type', '')
+                    action = getattr(event, 'action', None)
+                    step = getattr(event, 'step', None)
+                    frame_current = getattr(event, 'frame_current', None)
+                    frame_total = getattr(event, 'frame_total', None)
+                    
+                    # Build a meaningful message
+                    parts = []
+                    if event_type == "generating_narrations":
+                        parts.append("Generating narrations")
+                    elif event_type == "concatenating":
+                        parts.append("Concatenating video")
+                    elif event_type == "frame_step" and action:
+                        parts.append(_STEP_LABELS.get(action, action.title()))
+                    elif action:
+                        parts.append(action.title())
+                    
+                    if frame_current is not None and frame_total is not None:
+                        parts.append(f"frame {frame_current}/{frame_total}")
+                    elif step is not None:
+                        parts.append(f"step {step}")
+                    
+                    message = " - ".join(parts) if parts else ""
+                    
                     task_manager.update_progress(
                         task_id=task.task_id,
                         current=int(event.progress * 100),
                         total=100,
-                        message=getattr(event, 'action', '') or getattr(event, 'step', '')
+                        message=str(message)
                     )
             
             # Build video generation parameters

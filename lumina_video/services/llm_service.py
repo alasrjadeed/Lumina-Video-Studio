@@ -11,15 +11,20 @@
 # limitations under the License.
 
 """
-LLM (Large Language Model) Service - Direct OpenAI SDK implementation
+LLM Service with Hybrid Key Pool Rotation
 
-Supports structured output via response_type parameter (Pydantic model).
+Automatically rotates through API keys when one fails or runs out of credits.
+Exhausted keys go into 24h cooldown, then rejoin the pool.
 """
 
 import json
 import re
-from typing import Optional, Type, TypeVar, Union
+import time
+import asyncio
+from pathlib import Path
+from typing import Optional, Type, TypeVar, Union, List, Dict
 
+import yaml
 from openai import AsyncOpenAI
 from pydantic import BaseModel
 from loguru import logger
@@ -27,92 +32,250 @@ from loguru import logger
 
 T = TypeVar("T", bound=BaseModel)
 
+# State file to persist key cooldowns across restarts
+_STATE_FILE = Path("/tmp/lumina_llm_key_pool_state.json")
+
+
+class KeyState:
+    """Tracks cooldown state for a single API key"""
+    
+    def __init__(self, index: int, config: dict, cooldown_seconds: int = 86400):
+        self.index = index
+        self.provider = config.get("provider", "unknown")
+        self.api_key = config.get("api_key", "")
+        self.base_url = config.get("base_url", "")
+        self.model = config.get("model", "")
+        self.cooldown_seconds = cooldown_seconds
+        
+        # Cooldown tracking
+        self.exhausted_at: float = 0.0  # timestamp when key was marked exhausted
+        self.fail_count: int = 0
+        self.total_calls: int = 0
+        self.total_errors: int = 0
+    
+    @property
+    def is_cooling_down(self) -> bool:
+        """Check if key is still in cooldown period"""
+        if self.exhausted_at == 0:
+            return False
+        elapsed = time.time() - self.exhausted_at
+        if elapsed >= self.cooldown_seconds:
+            # Cooldown expired, key is available again
+            self.exhausted_at = 0
+            self.fail_count = 0
+            logger.info(f"  Key [{self.index}] {self.provider}: cooldown expired, rejoining pool")
+            return False
+        return True
+    
+    @property
+    def remaining_cooldown_min(self) -> float:
+        """Remaining cooldown in minutes"""
+        if self.exhausted_at == 0:
+            return 0
+        elapsed = time.time() - self.exhausted_at
+        remaining = self.cooldown_seconds - elapsed
+        return max(0, remaining / 60)
+    
+    def mark_exhausted(self):
+        """Mark key as exhausted (rate limit, no credits, etc.)"""
+        self.exhausted_at = time.time()
+        self.fail_count += 1
+        self.total_errors += 1
+        logger.warning(
+            f"  Key [{self.index}] {self.provider}: exhausted "
+            f"(cooldown {self.cooldown_seconds // 3600}h)"
+        )
+    
+    def mark_success(self):
+        """Record a successful call"""
+        self.total_calls += 1
+        self.fail_count = 0  # Reset consecutive failures
+    
+    def to_dict(self) -> dict:
+        return {
+            "index": self.index,
+            "provider": self.provider,
+            "exhausted_at": self.exhausted_at,
+            "fail_count": self.fail_count,
+            "total_calls": self.total_calls,
+            "total_errors": self.total_errors,
+        }
+    
+    def load_state(self, data: dict):
+        self.exhausted_at = data.get("exhausted_at", 0.0)
+        self.fail_count = data.get("fail_count", 0)
+        self.total_calls = data.get("total_calls", 0)
+        self.total_errors = data.get("total_errors", 0)
+
+
+class KeyPool:
+    """
+    API Key Pool with automatic rotation and 24h cooldown cycle.
+    
+    Behavior:
+    1. Tries keys in pool order (primary first)
+    2. On failure (rate limit, 429, auth error, timeout), marks key exhausted
+    3. Exhausted keys skip for 24 hours
+    4. After 24h, key rejoins the pool automatically
+    5. State persists across restarts via JSON file
+    """
+    
+    def __init__(self):
+        self.keys: List[KeyState] = []
+        self.current_index: int = 0
+        self.cooldown_seconds: int = 86400  # 24h default
+        self._load_config()
+        self._load_state()
+    
+    def _load_config(self):
+        """Load key pool from config.yaml"""
+        try:
+            # Find config.yaml relative to this file
+            config_path = Path(__file__).parent.parent.parent / "config.yaml"
+            if not config_path.exists():
+                # Try from working directory
+                config_path = Path("config.yaml")
+            
+            with open(config_path) as f:
+                raw = yaml.safe_load(f)
+            
+            pool_config = raw.get("llm_key_pool", {})
+            self.cooldown_seconds = pool_config.get("cooldown_hours", 24) * 3600
+            
+            keys_config = pool_config.get("keys", [])
+            for i, key_cfg in enumerate(keys_config):
+                self.keys.append(KeyState(i, key_cfg, self.cooldown_seconds))
+            
+            logger.info(f"Loaded {len(self.keys)} API keys in rotation pool")
+            
+        except Exception as e:
+            logger.error(f"Failed to load key pool config: {e}")
+    
+    def _load_state(self):
+        """Load persisted cooldown state"""
+        if not _STATE_FILE.exists():
+            return
+        try:
+            data = json.loads(_STATE_FILE.read_text())
+            for ks in self.keys:
+                key = f"{ks.provider}_{ks.index}"
+                if key in data:
+                    ks.load_state(data[key])
+            logger.debug("Loaded key pool state from disk")
+        except Exception:
+            pass
+    
+    def _save_state(self):
+        """Persist cooldown state to disk"""
+        try:
+            state = {}
+            for ks in self.keys:
+                key = f"{ks.provider}_{ks.index}"
+                state[key] = ks.to_dict()
+            _STATE_FILE.write_text(json.dumps(state, indent=2))
+        except Exception:
+            pass
+    
+    def get_next_key(self) -> Optional[KeyState]:
+        """Get next available key from pool"""
+        if not self.keys:
+            return None
+        
+        # Try all keys starting from current position
+        for _ in range(len(self.keys)):
+            ks = self.keys[self.current_index]
+            self.current_index = (self.current_index + 1) % len(self.keys)
+            
+            if not ks.is_cooling_down:
+                return ks
+        
+        # All keys are cooling down - find the one with shortest remaining cooldown
+        best = None
+        for ks in self.keys:
+            if ks.is_cooling_down:
+                if best is None or ks.exhausted_at > best.exhausted_at:
+                    best = ks
+        
+        if best:
+            logger.warning(
+                f"All {len(self.keys)} keys cooling down. "
+                f"Next available: {best.provider} in {best.remaining_cooldown_min:.0f}min"
+            )
+        
+        return best
+    
+    def report_success(self, key: KeyState):
+        """Report successful call"""
+        key.mark_success()
+        self._save_state()
+    
+    def report_failure(self, key: KeyState, error: Exception):
+        """Report failed call - may trigger rotation"""
+        error_str = str(error).lower()
+        
+        # Determine if this is a "rotate-worthy" error
+        should_rotate = any(signal in error_str for signal in [
+            "429", "rate_limit", "rate limit", "too many requests",
+            "quota", "credits", "insufficient", "billing",
+            "invalid_api_key", "authentication", "auth",
+            "timeout", "timed out", "connection",
+            "500", "502", "503", "504",
+        ])
+        
+        if should_rotate:
+            key.mark_exhausted()
+            self._save_state()
+    
+    def get_status(self) -> List[dict]:
+        """Get status of all keys in pool"""
+        result = []
+        for ks in self.keys:
+            status = "active"
+            if ks.is_cooling_down:
+                status = f"cooling ({ks.remaining_cooldown_min:.0f}min left)"
+            
+            result.append({
+                "provider": ks.provider,
+                "model": ks.model,
+                "status": status,
+                "calls": ks.total_calls,
+                "errors": ks.total_errors,
+                "key_preview": ks.api_key[:12] + "..." if len(ks.api_key) > 12 else ks.api_key,
+            })
+        return result
+
+
+# Global key pool instance
+_key_pool: Optional[KeyPool] = None
+
+
+def get_key_pool() -> KeyPool:
+    global _key_pool
+    if _key_pool is None:
+        _key_pool = KeyPool()
+    return _key_pool
+
 
 class LLMService:
     """
-    LLM (Large Language Model) service
+    LLM Service with hybrid key pool rotation.
     
-    Direct implementation using OpenAI SDK. No capability layer needed.
-    
-    Supports all OpenAI SDK compatible providers:
-    - OpenAI (gpt-4o, gpt-4o-mini, gpt-3.5-turbo)
-    - Alibaba Qwen (qwen-max, qwen-plus, qwen-turbo)
-    - Anthropic Claude (claude-sonnet-4-5, claude-opus-4, claude-haiku-4)
-    - DeepSeek (deepseek-chat)
-    - Moonshot Kimi (moonshot-v1-8k, moonshot-v1-32k, moonshot-v1-128k)
-    - Ollama (llama3.2, qwen2.5, mistral, codellama) - FREE & LOCAL!
-    - Any custom provider with OpenAI-compatible API
-    
-    Usage:
-        # Direct call
-        answer = await lumina_video.llm("Explain atomic habits")
-        
-        # With parameters
-        answer = await lumina_video.llm(
-            prompt="Explain atomic habits in 3 sentences",
-            temperature=0.7,
-            max_tokens=2000
-        )
+    Automatically rotates through free API keys when one fails.
+    24h cooldown cycle for exhausted keys.
     """
     
     def __init__(self, config: dict):
-        """
-        Initialize LLM service
-        
-        Args:
-            config: Full application config dict (kept for backward compatibility)
-        """
-        # Note: We no longer cache config here to support hot reload
-        # Config is read dynamically from config_manager in _get_config_value()
         self._client: Optional[AsyncOpenAI] = None
+        self._pool = get_key_pool()
     
     def _get_config_value(self, key: str, default=None):
-        """
-        Get config value dynamically from config_manager (supports hot reload)
-        
-        Args:
-            key: Config key name
-            default: Default value if not found
-        
-        Returns:
-            Config value
-        """
         from lumina_video.config import config_manager
         return getattr(config_manager.config.llm, key, default)
     
-    def _create_client(
-        self,
-        api_key: Optional[str] = None,
-        base_url: Optional[str] = None,
-    ) -> AsyncOpenAI:
-        """
-        Create OpenAI client
-        
-        Args:
-            api_key: API key (optional, uses config if not provided)
-            base_url: Base URL (optional, uses config if not provided)
-        
-        Returns:
-            AsyncOpenAI client instance
-        """
-        # Get API key (priority: parameter > config)
-        final_api_key = (
-            api_key
-            or self._get_config_value("api_key")
-            or "dummy-key"  # Ollama doesn't need real key
-        )
-        
-        # Get base URL (priority: parameter > config)
-        final_base_url = (
-            base_url
-            or self._get_config_value("base_url")
-        )
-        
-        # Create client
-        client_kwargs = {"api_key": final_api_key}
-        if final_base_url:
-            client_kwargs["base_url"] = final_base_url
-        
+    def _create_client(self, api_key: str, base_url: str) -> AsyncOpenAI:
+        client_kwargs = {"api_key": api_key}
+        if base_url:
+            client_kwargs["base_url"] = base_url
         return AsyncOpenAI(**client_kwargs)
     
     async def __call__(
@@ -127,119 +290,90 @@ class LLMService:
         **kwargs
     ) -> Union[str, T]:
         """
-        Generate text using LLM
+        Generate text using LLM with automatic key rotation.
         
-        Args:
-            prompt: The prompt to generate from
-            api_key: API key (optional, uses config if not provided)
-            base_url: Base URL (optional, uses config if not provided)
-            model: Model name (optional, uses config if not provided)
-            temperature: Sampling temperature (0.0-2.0). Lower is more deterministic.
-            max_tokens: Maximum tokens to generate
-            response_type: Optional Pydantic model class for structured output.
-                          If provided, returns parsed model instance instead of string.
-            **kwargs: Additional provider-specific parameters
-        
-        Returns:
-            Generated text (str) or parsed Pydantic model instance (if response_type provided)
-        
-        Examples:
-            # Basic text generation
-            answer = await lumina_video.llm("Explain atomic habits")
-            
-            # Structured output with Pydantic model
-            class MovieReview(BaseModel):
-                title: str
-                rating: int
-                summary: str
-            
-            review = await lumina_video.llm(
-                prompt="Review the movie Inception",
-                response_type=MovieReview
-            )
-            print(review.title)  # Structured access
+        If explicit api_key is provided, uses that directly.
+        Otherwise, rotates through the key pool.
         """
-        # Create client (new instance each time to support parameter overrides)
-        client = self._create_client(api_key=api_key, base_url=base_url)
+        # If caller provides explicit key, use it directly (no rotation)
+        if api_key:
+            client = self._create_client(api_key, base_url or self._get_config_value("base_url"))
+            final_model = model or self._get_config_value("model") or "gpt-3.5-turbo"
+            return await self._call_llm(client, final_model, prompt, temperature, max_tokens, response_type, **kwargs)
         
-        # Get model (priority: parameter > config)
-        final_model = (
-            model
-            or self._get_config_value("model")
-            or "gpt-3.5-turbo"  # Default fallback
-        )
+        # Key pool rotation mode
+        last_error = None
+        tried_count = 0
         
-        logger.debug(f"LLM call: model={final_model}, base_url={client.base_url}, response_type={response_type}")
-        
-        try:
-            if response_type is not None:
-                # Structured output mode - try beta.chat.completions.parse first
-                return await self._call_with_structured_output(
-                    client=client,
-                    model=final_model,
-                    prompt=prompt,
-                    response_type=response_type,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    **kwargs
+        while tried_count < len(self._pool.keys):
+            key_state = self._pool.get_next_key()
+            if key_state is None:
+                break
+            
+            tried_count += 1
+            client = self._create_client(key_state.api_key, key_state.base_url)
+            final_model = model or key_state.model
+            
+            logger.info(
+                f"LLM call: {key_state.provider}/{final_model} "
+                f"(key #{key_state.index}, attempt {tried_count})"
+            )
+            
+            try:
+                result = await self._call_llm(
+                    client, final_model, prompt, temperature, max_tokens,
+                    response_type, **kwargs
                 )
-            else:
-                # Standard text output mode
-                response = await client.chat.completions.create(
-                    model=final_model,
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    **kwargs
-                )
-                
-                raw_content = response.choices[0].message.content
-                result = raw_content if isinstance(raw_content, str) else ""
-                logger.debug(f"LLM response length: {len(result)} chars")
-                if not result or not result.strip():
-                    logger.warning(
-                        f"LLM returned empty text content (model={final_model}, base_url={client.base_url})"
-                    )
-                
+                self._pool.report_success(key_state)
                 return result
+                
+            except Exception as e:
+                last_error = e
+                self._pool.report_failure(key_state, e)
+                logger.warning(f"LLM failed ({key_state.provider}): {e}")
+                continue
         
-        except Exception as e:
-            logger.error(f"LLM call error (model={final_model}, base_url={client.base_url}): {e}")
-            raise
+        # All keys exhausted
+        logger.error(f"All {tried_count} LLM keys exhausted or failed")
+        if last_error:
+            raise last_error
+        raise RuntimeError("No LLM providers available")
     
-    async def _call_with_structured_output(
+    async def _call_llm(
         self,
         client: AsyncOpenAI,
         model: str,
         prompt: str,
-        response_type: Type[T],
         temperature: float,
         max_tokens: int,
+        response_type: Optional[Type[T]] = None,
         **kwargs
+    ) -> Union[str, T]:
+        """Single LLM call attempt"""
+        if response_type is not None:
+            return await self._call_with_structured_output(
+                client, model, prompt, response_type, temperature, max_tokens, **kwargs
+            )
+        else:
+            response = await client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=temperature,
+                max_tokens=max_tokens,
+                **kwargs
+            )
+            raw_content = response.choices[0].message.content
+            result = raw_content if isinstance(raw_content, str) else ""
+            if not result or not result.strip():
+                logger.warning(f"LLM returned empty content (model={model})")
+            return result
+    
+    async def _call_with_structured_output(
+        self, client, model, prompt, response_type, temperature, max_tokens, **kwargs
     ) -> T:
-        """
-        Call LLM with structured output support
-        
-        Uses JSON schema instruction appended to prompt for maximum compatibility
-        across all OpenAI-compatible providers (Qwen, DeepSeek, etc.).
-        
-        Args:
-            client: OpenAI client
-            model: Model name
-            prompt: The prompt
-            response_type: Pydantic model class
-            temperature: Sampling temperature
-            max_tokens: Max tokens
-            **kwargs: Additional parameters
-        
-        Returns:
-            Parsed Pydantic model instance
-        """
-        # Build JSON schema instruction and append to prompt
         json_schema_instruction = self._get_json_schema_instruction(response_type)
         enhanced_prompt = f"{prompt}\n\n{json_schema_instruction}"
         
-        # Call LLM with enhanced prompt
         response = await client.chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": enhanced_prompt}],
@@ -250,30 +384,12 @@ class LLMService:
         raw_content = response.choices[0].message.content
         content = raw_content if isinstance(raw_content, str) else ""
         
-        logger.debug(f"Structured output response length: {len(content)} chars")
-        if not content or not content.strip():
-            logger.warning(
-                f"LLM returned empty structured-output content (model={model}, base_url={client.base_url})"
-            )
-        
-        # Parse JSON from response content
         return self._parse_response_as_model(content, response_type)
     
     def _get_json_schema_instruction(self, response_type: Type[T]) -> str:
-        """
-        Generate JSON schema instruction for LLM fallback mode
-        
-        Args:
-            response_type: Pydantic model class
-        
-        Returns:
-            Formatted instruction string with JSON schema
-        """
         try:
-            # Get JSON schema from Pydantic model
             schema = response_type.model_json_schema()
             schema_str = json.dumps(schema, indent=2, ensure_ascii=False)
-            
             return f"""## IMPORTANT: JSON Output Format Required
 You MUST respond with ONLY a valid JSON object (no markdown, no extra text).
 The JSON must strictly follow this schema:
@@ -289,24 +405,12 @@ Output ONLY the JSON object, nothing else."""
 You MUST respond with ONLY a valid JSON object (no markdown, no extra text)."""
     
     def _parse_response_as_model(self, content: str, response_type: Type[T]) -> T:
-        """
-        Parse LLM response content as Pydantic model
-        
-        Args:
-            content: Raw LLM response text
-            response_type: Target Pydantic model class
-        
-        Returns:
-            Parsed model instance
-        """
-        # Try direct JSON parsing first
         try:
             data = json.loads(content)
             return response_type.model_validate(data)
         except json.JSONDecodeError:
             pass
         
-        # Try extracting from markdown code block
         json_pattern = r'```(?:json)?\s*([\s\S]+?)\s*```'
         match = re.search(json_pattern, content, re.DOTALL)
         if match:
@@ -316,7 +420,6 @@ You MUST respond with ONLY a valid JSON object (no markdown, no extra text)."""
             except json.JSONDecodeError:
                 pass
         
-        # Try to find any JSON object in the text
         brace_start = content.find('{')
         brace_end = content.rfind('}')
         if brace_start != -1 and brace_end > brace_start:
@@ -331,19 +434,12 @@ You MUST respond with ONLY a valid JSON object (no markdown, no extra text)."""
     
     @property
     def active(self) -> str:
-        """
-        Get active model name
-        
-        Returns:
-            Active model name
-        
-        Example:
-            print(f"Using model: {lumina_video.llm.active}")
-        """
         return self._get_config_value("model", "gpt-3.5-turbo")
     
+    @property
+    def pool_status(self) -> List[dict]:
+        """Get key pool status"""
+        return self._pool.get_status()
+    
     def __repr__(self) -> str:
-        """String representation"""
-        model = self.active
-        base_url = self._get_config_value("base_url", "default")
-        return f"<LLMService model={model!r} base_url={base_url!r}>"
+        return f"<LLMService pool={len(self._pool.keys)} keys active>"

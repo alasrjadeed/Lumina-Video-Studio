@@ -16,7 +16,7 @@ FastAPI Dependencies
 Provides dependency injection for LuminaVideoCore and other services.
 """
 
-from typing import Annotated
+from typing import Annotated, Optional
 from fastapi import Depends
 from loguru import logger
 
@@ -24,7 +24,7 @@ from lumina_video.service import LuminaVideoCore
 
 
 # Global Lumina Video Studio instance
-_lumina_video_instance: LuminaVideoCore = None
+_lumina_video_instance: Optional[LuminaVideoCore] = None
 
 
 async def get_lumina_video() -> LuminaVideoCore:

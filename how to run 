@@ -1,2 +1,53 @@
 cd "/home/oem/Documents/Lumina Video Studio"
 .venv/bin/streamlit run web/app.py --server.port 8501 --server.headless true --server.address 0.0.0.0
+
+https://github.com/runcat-dev/RunCat365
+
+Restart the server to see changes:
+ps aux | grep streamlit | awk '{print $2}' | xargs kill -9
+cd "/home/oem/Documents/Lumina Video Studio" && .venv/bin/streamlit run web/app.py --server.port 8501 --server.headless true --server.address 0.0.0.0
+
+
+
+$ cd "/home/oem/Documents/Lumina Video Studio" && bash scripts/start_servers.sh
+═══════════════════════════════════════════════════
+  Lumina Video Studio - Servers Started
+═══════════════════════════════════════════════════
+
+  ✓ FastAPI:    http://localhost:8000  (HTTP 200)
+  ✓ Streamlit:  http://localhost:8501  (HTTP 200)
+
+  Mobile API:  http://192.168.1.152:8000
+  Web UI:      http://192.168.1.152:8501
+
+
+Quick Start (when you come back)
+# 1. Start servers
+cd "/home/oem/Documents/Lumina Video Studio"
+bash scripts/start_servers.sh
+
+# 2. Check they're running
+curl http://localhost:8000/health
+curl http://localhost:8501
+Full Restore (if needed)
+# Restore from backup
+cd /home/oem/Documents
+tar xzf Lumina_Video_Studio_BACKUP_*.tar.gz
+cd "Lumina Video Studio"
+
+# Reinstall venv
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+
+# Rebuild Flutter APK
+cd mobile
+/home/oem/flutter/bin/flutter pub get
+/home/oem/flutter/bin/flutter build apk --debug
+Key Files Reference
+File	Purpose
+config.yaml	API keys (RunningHub, LLM)
+scripts/start_servers.sh	Start both servers
+scripts/stop_servers.sh	Stop both servers
+api/routers/websocket.py	WebSocket progress
+mobile/lib/app.dart	Flutter app entry
+mobile/build/.../app-debug.apk	Android APK

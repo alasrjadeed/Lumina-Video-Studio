@@ -21,10 +21,11 @@ from web.utils.streamlit_helpers import safe_rerun
 
 
 def render_header():
-    """Render page header with title and language selector"""
+    """Render page header with title, author info, and language selector"""
     col1, col2 = st.columns([4, 1])
     with col1:
         st.markdown(f"<h3>{tr('app.title')}</h3>", unsafe_allow_html=True)
+        st.caption("Developer: AL ASAR JADEED | [alasarjadeed.com](https://alasarjadeed.com/)")
     with col2:
         render_language_selector()
 

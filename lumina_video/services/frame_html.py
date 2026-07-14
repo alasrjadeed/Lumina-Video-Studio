@@ -424,6 +424,32 @@ class HTMLFrameGenerator:
             context.update(ext)
         
         html = self._replace_parameters(self.template, context)
+        
+        # Ensure every frame has author/brand watermark
+        author = context.get("author", "@AL ASAR JADEED")
+        brand = context.get("brand", "Lumina Video Studio | alasarjadeed.com")
+        describe = context.get("describe", "AI Video Generator by AL ASAR JADEED")
+        
+        watermark_html = f"""
+        <div style="
+            position: fixed;
+            bottom: 16px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 9999;
+            pointer-events: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            letter-spacing: 0.5px;
+        ">
+            {author} | {brand} | {describe}
+        </div>
+        """
+        if '</body>' in html:
+            html = html.replace('</body>', f'{watermark_html}\n</body>')
 
         if output_path is None:
             from lumina_video.utils.os_util import get_output_path

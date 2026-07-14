@@ -40,6 +40,10 @@ class TaskProgress(BaseModel):
     total: int = 0
     percentage: float = 0.0
     message: str = ""
+    
+    def model_post_init(self, __context):
+        if self.message is None:
+            self.message = ""
 
 
 class Task(BaseModel):

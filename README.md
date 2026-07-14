@@ -467,6 +467,12 @@ This project is released under the Apache License 2.0. For details, please see t
 
 
 
+## 👤 Author
+
+**AL ASAR JADEED**
+- Website: [alasarjadeed.com](https://alasarjadeed.com/)
+
+
 ## ⭐ Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=LuminaAI/Lumina-Video-Studio&type=Date)](https://star-history.com/#LuminaAI/Lumina-Video-Studio&Date)

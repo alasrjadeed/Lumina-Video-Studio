@@ -63,11 +63,11 @@ async def list_tts_workflows(lumina_video: LuminaVideoDep):
         all_workflows = lumina_video.tts.list_workflows()
         
         # Filter to TTS workflows only (filename starts with "tts_")
-        tts_workflows = [
-            WorkflowInfo(**wf) 
-            for wf in all_workflows 
-            if wf["name"].startswith("tts_")
-        ]
+        tts_workflows = []
+        for wf in all_workflows:
+            name = wf.get("name", "")
+            if name.startswith("tts_"):
+                tts_workflows.append(WorkflowInfo(**wf))
         
         return WorkflowListResponse(workflows=tts_workflows)
         
@@ -111,7 +111,10 @@ async def list_media_workflows(lumina_video: LuminaVideoDep):
         # Get all workflows from media service (includes both image and video)
         all_workflows = lumina_video.media.list_workflows()
         
-        media_workflows = [WorkflowInfo(**wf) for wf in all_workflows]
+        media_workflows = []
+        for wf in all_workflows:
+            if isinstance(wf, dict):
+                media_workflows.append(WorkflowInfo(**wf))
         
         return WorkflowListResponse(workflows=media_workflows)
         
@@ -132,11 +135,11 @@ async def list_image_workflows(lumina_video: LuminaVideoDep):
         all_workflows = lumina_video.media.list_workflows()
         
         # Filter to image workflows only (filename starts with "image_")
-        image_workflows = [
-            WorkflowInfo(**wf) 
-            for wf in all_workflows 
-            if wf["name"].startswith("image_")
-        ]
+        image_workflows = []
+        for wf in all_workflows:
+            name = wf.get("name", "")
+            if name.startswith("image_"):
+                image_workflows.append(WorkflowInfo(**wf))
         
         return WorkflowListResponse(workflows=image_workflows)
         
@@ -178,6 +181,8 @@ async def list_templates():
         # Convert to API response format
         templates = []
         for t in all_templates:
+            if t is None or t.display_info is None:
+                continue
             templates.append(TemplateInfo(
                 name=t.display_info.name,
                 display_name=t.display_info.name,

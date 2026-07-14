@@ -314,5 +314,52 @@ class MediaService(ComfyBaseService):
                 )
         
         except Exception as e:
+            error_str = str(e).lower()
+            is_runninghub_fail = any(s in error_str for s in [
+                "not_enough_power", "runninghub", "TASK_CREATE_FAILED"
+            ])
+            
+            if is_runninghub_fail and media_type == "image":
+                logger.warning(f"RunningHub failed, falling back to Pollinations.ai for image")
+                return await self._pollinations_fallback(prompt, width or 1024, height or 1024)
+            
             logger.error(f"Media generation error: {e}")
             raise
+    
+    async def _pollinations_fallback(self, prompt: str, width: int, height: int) -> MediaResult:
+        """Free image generation fallback using Pollinations.ai"""
+        import asyncio
+        import urllib.parse
+        import hashlib
+        from pathlib import Path
+        
+        encoded_prompt = urllib.parse.quote(prompt)
+        url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true"
+        
+        logger.info(f"Pollinations.ai fallback: generating image ({width}x{height})")
+        
+        # Generate to temp file
+        output_dir = Path("/tmp/lumina_pollinations")
+        output_dir.mkdir(exist_ok=True)
+        filename = f"img_{hashlib.md5(prompt.encode()).hexdigest()[:8]}.jpg"
+        output_path = output_dir / filename
+        
+        proc = await asyncio.create_subprocess_exec(
+            "curl", "-s", "-L", "-o", str(output_path), url, "--max-time", "120",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        await proc.wait()
+        
+        if not output_path.exists() or output_path.stat().st_size == 0:
+            raise Exception("Pollinations.ai failed to generate image")
+        
+        # Convert to accessible URL via the API files endpoint
+        image_url = f"http://localhost:8000/api/files?path={output_path}"
+        
+        logger.info(f"Pollinations.ai image saved: {output_path} ({output_path.stat().st_size} bytes)")
+        
+        return MediaResult(
+            media_type="image",
+            url=str(output_path)
+        )

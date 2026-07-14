@@ -24,7 +24,7 @@ from loguru import logger
 router = APIRouter(prefix="/files", tags=["Files"])
 
 
-@router.get("/{file_path:path}")
+@router.api_route("/{file_path:path}", methods=["GET", "HEAD"])
 async def get_file(file_path: str):
     """
     Get file by path

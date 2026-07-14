@@ -464,6 +464,12 @@ This project is released under the Apache License 2.0. For details, please see t
 | <img src="https://raw.githubusercontent.com/HITsz-TMG/Anim-Director/main/AniMaker/assets/pipeline.png" width="420" alt="AniMaker pipeline"/> | **[SIGGRAPH Asia 2025] AniMaker: Multi-Agent Animated Storytelling with MCTS-Driven Clip Generation**<br>*Haoyuan Shi, Yunxin Li, Xinyu Chen, Longyue Wang, Baotian Hu, Min Zhang*<br>[[Paper](https://doi.org/10.1145/3757377.3764009)] [[GitHub](https://github.com/HITsz-TMG/Anim-Director/tree/main/AniMaker)] |
 
 
+## 👤 Author
+
+**AL ASAR JADEED**
+- Website: [alasarjadeed.com](https://alasarjadeed.com/)
+
+
 ## ⭐ Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=LuminaAI/Lumina-Video-Studio&type=Date)](https://star-history.com/#LuminaAI/Lumina-Video-Studio&Date)

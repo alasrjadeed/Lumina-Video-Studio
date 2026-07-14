@@ -191,7 +191,7 @@ class VideoService:
             (
                 ffmpeg
                 .input(filelist, format='concat', safe=0)
-                .output(output, c='copy')
+                .output(output, c='copy', **{'movflags': 'faststart'})
                 .overwrite_output()
                 .run(capture_stdout=True, capture_stderr=True)
             )
@@ -229,6 +229,7 @@ class VideoService:
                 '-filter_complex', filter_complex,
                 '-map', '[v]',
                 '-map', '[a]',
+                '-movflags', '+faststart',
                 '-y',  # Overwrite output
                 output
             ])

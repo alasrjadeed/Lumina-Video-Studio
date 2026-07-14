@@ -204,7 +204,7 @@ class TaskManager:
             current=current,
             total=total,
             percentage=percentage,
-            message=message
+            message=str(message) if message else ""
         )
         
         # Notify subscribers
